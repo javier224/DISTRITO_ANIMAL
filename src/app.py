@@ -50,9 +50,19 @@ bcrypt.init_app(app)
 mail.init_app(app)
 db.init_app(app)
 
-# 🛠️ CREACIÓN VIRTUAL/AUTOMÁTICA DE TABLAS 
+# CREACIÓN TABLAS 
 with app.app_context():
     db.create_all()
+    
+    from src.models import Rol
+    if not Rol.query.first():
+        rol_admin = Rol(id=1, nombre='Administrador')
+        rol_vet = Rol(id=2, nombre='Veterinario')
+        rol_cliente = Rol(id=3, nombre='Cliente')
+        
+        db.session.add_all([rol_admin, rol_vet, rol_cliente])
+        db.session.commit()
+        print("¡Roles base insertados con éxito!")
 
 
 from src.catalogo import catalogo_bp
