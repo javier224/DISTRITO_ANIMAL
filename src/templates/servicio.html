@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Servicios</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_servicios.css')}}">
+</head>
+
+<body>
+   <header class="main-header">
+        <a href="/">
+            <img src="{{ url_for('static', filename='/img/DA.IMG.jpg')}}" class="logo" alt="Distrito Animal">
+        </a>
+        
+        <!-- Botón Hamburguesa para Móviles -->
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Contenedor de navegación que se animará en móviles -->
+        <div class="nav-container" id="nav-container">
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">INICIO</a></li>
+                    <li><a href="{{ url_for('servicios') }}">SERVICIOS</a></li>
+                    <li><a href="{{ url_for('contactanos') }}">CONTACTANOS</a></li>
+                </ul>
+            </nav>
+            <a href="{{ url_for('login') }}" class="inicio_sesion">INICIAR SESIÓN</a>
+        </div>
+    </header>
+
+    <main class="contenedor_servicio">
+        <h1>SERVICIOS</h1>
+
+        <!-- Servicio Esterilización -->
+        <section class="servicio">
+            <article class="texto-servicio">
+                <h2>ESTERILIZACIÓN</h2>
+                <p>
+                    En nuestro grupo veterinario ofrecemos esterilización segura, profesional y al alcance de todos.
+                    Protege su salud, mejora su comportamiento y evita camadas no deseadas. Contamos con médicos
+                    especializados,
+                    seguimiento postoperatorio y atención con cariño. ¡Agenda ya tu cita y dale a tu mascota una vida
+                    más tranquila
+                    y saludable! Porque cuidar de ellos también es un acto de amor.
+                </p>
+                <div class="costo">COSTO: $45.000COP</div>
+                <div class="duracion">DURACIÓN: 30:00MIN</div>
+            </article>
+            <figure class="img-servicio">
+                <img src="https://static.vecteezy.com/system/resources/previews/000/367/578/large_2x/vector-dog-and-cat-with-collars.jpg"
+                    alt="Ilustración de un perro y un gato con collares">
+            </figure>
+        </section>
+
+        <!-- Servicio Desparasitación -->
+        <section class="servicio reverse">
+            <figure class="img-servicio">
+                <img src="https://tse2.mm.bing.net/th/id/OIP.pH6LkGNNRbWj6aD2AHzA2AHaE8?r=0&w=612&h=408&rs=1&pid=ImgDetMain&o=7&rm=3"
+                    alt="Mascota recibiendo desparasitación">
+            </figure>
+            <article class="texto-servicio">
+                <h2>DESPARACITACIÓN</h2>
+                <p>
+                    En nuestra clínica veterinaria, la desparasitación es más que un tratamiento: es una promesa de
+                    bienestar.
+                    Los parásitos internos y externos pueden afectar gravemente la salud de tu mascota y la de tu
+                    familia.
+                    Con un plan de desparasitación regular, previenes enfermedades, fortaleces su sistema inmune y
+                    alargas su vida.
+                    ¡No esperes a ver síntomas! La prevención es la mejor medicina.
+                </p>
+                <div class="costo">COSTO: $45.000COP</div>
+                <div class="duracion">DURACIÓN: 30:00MIN</div>
+            </article>
+        </section>
+
+        <!-- Servicio Spa -->
+        <section class="servicio">
+            <article class="texto-servicio">
+                <h2>SPA ANIMAL</h2>
+                <p>
+                    El bienestar también se siente en la piel.
+                    Ofrecemos baños relajantes, masajes, limpieza profunda, corte de uñas y estilismo profesional.
+                    Ideal para reducir el estrés, mejorar la piel y dejar su pelaje brillante y saludable.
+                    Usamos productos hipoalergénicos y técnicas suaves, adaptadas a cada especie y temperamento.
+                    ¡Porque ellos también merecen consentirse!
+                </p>
+                <div class="costo">COSTO: $45.000COP</div>
+                <div class="duracion">DURACIÓN: 30:00MIN</div>
+            </article>
+            <figure class="img-servicio">
+                <img src="https://th.bing.com/th/id/R.e08535f2406d4bcec76a00cb780c1108?rik=pVMz1Jjys%2bRoRw&pid=ImgRaw&r=0"
+                    alt="Perro disfrutando de un servicio de spa">
+            </figure>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container-footer">
+            <div class="footer-row">
+                <div class="footer-links">
+                    <h4>Distrito Animal</h4>
+                    <ul>
+                        <a href="{{ url_for('index') }}">
+                            <li>Inicio</li>
+                        </a>
+
+                        <a href="{{ url_for('servicios') }}">
+                            <li>Servicios</li>
+                        </a>
+
+                        <a href="{{ url_for('contactanos') }}">
+                            <li>Contactanos</li>
+                        </a>
+
+                        <a href="#">
+                            <li>Registrate</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-links">
+                    <h4>Ayuda</h4>
+                    <ul>
+                        <a href="tel:+6016745375" target="_blank">
+                            <li>Telefono: 3224577898</li>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=VetDistriAnimal@gmail.com&su=Asunto&body=Mensaje" target="_blank">
+                            <li>email: distrianimal@gmail.com</li>
+                        </a>
+
+                        <a href="https://wa.me/573208478040?text=Hola,%20quiero%20más%20información" target="_blank">
+                            <li>whatsapp:3208478040</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+                <div class="footer-links">
+                    <h4>Siguenos</h4>
+                    <ul>
+                        <a href="https://www.facebook.com/VetDistritoAnimal?locale=es_LA" target="_blank">
+                            <li>Facebook</li>
+                        </a>
+                        <a href="https://www.instagram.com/vetdistritoanimal/" target="_blank">
+                            <li>Instagram</li>
+                        </a>
+                        <a href="https://x.com/vDistritoAnimal" target="_blank">
+                            <li>X</li>
+                        </a>
+                        <a href="https://www.tiktok.com/@vet.distritoanimal" target="_blank">
+                            <li>Tiktok</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+        <center>
+            <p class="p-footer">© Creado y desarrollado por grupo scrum 5</p>
+        </center>
+
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navcontainer = document.getElementById('nav-container');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navcontainer.classList.toggle('active');
+        });
+
+        // Opcional: Cerrar el menú si se hace clic en un enlace
+        const navLinks = document.querySelectorAll('.nav-links a, .inicio_sesion');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navcontainer.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+</body>
+
+</html>

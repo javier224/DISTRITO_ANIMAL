@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Módulo de Facturación - Distrito Animal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://kit.fontawesome.com/ff8514b855.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tablas.css') }}">
+
+    <style>
+        .form-control:focus,
+        .form-select:focus,
+        .table select:focus,
+        .table input:focus {
+            border-color: var(--color-accent) !important;
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        /* Estilización de los campos inyectados dinámicamente por JavaScript */
+        .table select {
+            display: block;
+            width: 100%;
+            padding: 0.375rem 1.5rem 0.375rem 0.5rem;
+            font-size: 0.9rem;
+            color: #212529;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+        }
+
+        .table input[type="number"] {
+            width: 100%;
+            padding: 0.375rem 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .fw-mono {
+            font-family: monospace;
+        }
+
+        .btn-remove {
+            background: none;
+            border: none;
+            color: #dc3545;
+            font-size: 1.2rem;
+            transition: transform 0.2s;
+        }
+
+        .btn-remove:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+    <input type="checkbox" name="" id="slidebar_toggle">
+
+    <div class="slidebar">
+        <div class="slidebar_brand">
+            <div class="brand_flex">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" width="30px" alt="Logo">
+                <div brand_icons>
+                    <span class="las la-bell"></span>
+                    <span class="las la-user-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sliderbar_main">
+            <div class="slidebar_user">
+                <img src="{{ url_for('static', filename='img/DA.IMG.jpg') }}" alt="User">
+                <div>
+                    <h3>DISTRITO ANIMAL</h3>
+                    <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
+                </div>
+            </div>
+
+            <div class="sliderbar_menu">
+                <div class="menu_head">
+                    <span>Dashboard</span>
+                </div>
+                <ul>
+                    <li>
+                        <a
+                            href="{% if session['id_rol'] == 1 %}{{ url_for('admin_dashboard') }}{% elif session['id_rol'] == 2 %}{{ url_for('vet_dashboard') }}{% else %}{{ url_for('cliente_dashboard') }}{% endif %}">
+                            <span class="las la-chart-pie"></span> ANALISIS
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('veterinario_bp.veterinario') }}">
+                            <span class="las la-syringe"></span> VETERINARIO
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('mascota_bp.mascota')}}">
+                            <span class="las la-paw"></span> MASCOTA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('vacuna.home') }}">
+                            <span class="las la-syringe"></span> VACUNA
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('cita_bp.cita')}}">
+                            <span class="las la-calendar-alt"></span> AGENDAR CITA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('desparasitante.home') }}">
+                            <span class="las la-capsules"></span> DESPARASITACIÓN
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('servicio.home') }}">
+                            <span class="las la-concierge-bell"></span> SERVICIOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('alimento.home') }}">
+                            <span class="las la-cookie-bite"></span> ALIMENTOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('catalogo.home') }}">
+                            <span class="las la-plus-circle"></span> CATÁLOGO
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('factura.lista_factura') }}">
+                            <span class="las la-file-invoice-dollar"></span> FACTURA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="main_content">
+
+
+        <header>
+            <div class="menu_toggle">
+                <label for="slidebar_toggle">
+                    <span class="las la-bars"></span>
+                </label>
+            </div>
+
+            <div class="header_icons">
+                <span class="las la-bookmark"></span>
+                <form action="{{ url_for('login') }}" method="post" class="d-inline m-0">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <span class="las la-sign-out-alt" title="Cerrar Sesión"
+                            style="font-size: 1.4rem; color: var(--color-text-dark);"></span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <div class="text-center mt-4 mb-4">
+                <h1 class="display-5 fw-bold" style="color: var(--color-text-dark);">
+                    <i class="las la-file-invoice-dollar me-2" style="color: var(--color-accent);"></i>Nueva Factura
+                    Ventanilla
+                </h1>
+                <div class="mx-auto"
+                    style="height: 4px; width: 60px; border-radius: 2px; background-color: var(--color-accent);"></div>
+                <p class="text-muted mt-2">Punto de venta y expedición de comprobantes operativos</p>
+            </div>
+
+            <form action="" id="factura" class="p-4 rounded shadow bg-white border-0 bootstrap-form-override">
+
+                <h4 class="mb-4 text-success fw-bold"><i class="las la-receipt me-2"></i>Encabezado de Transacción</h4>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6 col-lg-3">
+                        <label for="numero_consecutivo"
+                            class="form-label fw-bold small text-muted text-uppercase">Consecutivo</label>
+                        <input type="text" id="numero_consecutivo" name="numero_consecutivo" value="{{ consecutivo }}"
+                            class="form-control shadow-sm" readonly style="border-radius: 8px;">
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+                        <label for="fecha_expedicion" class="form-label fw-bold small text-muted text-uppercase">Fecha
+                            de Expedición</label>
+                        <input type="date" id="fecha_expedicion" class="form-control shadow-sm" required
+                            style="border-radius: 8px;">
+                    </div>
+                    <div class="col-md-10 col-lg-6">
+                        <label for="fk_usuario" class="form-label fw-bold small text-muted text-uppercase">Cliente
+                            Asociado</label>
+                        <select name="fk_usuario" id="fk_usuario" class="form-select shadow-sm"
+                            style="border-radius: 8px; display: block; width: 100%; padding: 0.375rem 2.25rem 0.375rem 0.75rem;">
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="estado_pago" class="form-label fw-bold small text-muted text-uppercase">Estado de la
+                            Factura</label>
+                        <select name="estado_pago" id="estado_pago" class="form-select shadow-sm"
+                            style="border-radius: 8px; display: block; width: 100%; padding: 0.375rem 2.25rem 0.375rem 0.75rem;">
+                            <option value="PAGADA">PAGADA</option>
+                            <option value="PENDIENTE">PENDIENTE</option>
+                            <option value="ANULADA">ANULADA</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="metodo_pago" class="form-label fw-bold small text-muted text-uppercase">Pasarela /
+                            Método de Pago</label>
+                        <select name="metodo_pago" id="metodo_pago" class="form-select shadow-sm"
+                            style="border-radius: 8px; display: block; width: 100%; padding: 0.375rem 2.25rem 0.375rem 0.75rem;">
+                            <option value="NEQUI">NEQUI</option>
+                            <option value="BANCOLOMBIA">BANCOLOMBIA</option>
+                            <option value="DAVIPLATA">DAVIPLATA</option>
+                            <option value="DALE">DALE</option>
+                            <option value="BRE-B">BRE-B</option>
+                        </select>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: #eaedf1;">
+
+                <div class="table_container_global p-0 border-0 shadow-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="m-0 fw-bold text-dark"><i class="las la-cubes me-2"></i>Desglose de Conceptos</h4>
+                        <button type="button" onclick="agregarFila()" class="btn btn-sm text-white fw-bold px-3"
+                            style="background-color: var(--color-main); border-radius: 6px;">
+                            <i class="fas fa-plus me-1"></i> Añadir Ítem
+                        </button>
+                    </div>
+
+                    <div class="table_responsive m-0">
+                        <table id="tablaDetalles" class="align-middle">
+                            <thead>
+                                <tr>
+                                    <th style="min-width: 280px;">Producto / Servicio</th>
+                                    <th style="width: 110px;">Cantidad</th>
+                                    <th style="width: 150px;">Precio Unitario</th>
+                                    <th style="width: 150px;">% IVA</th>
+                                    <th style="width: 150px;">IVA</th>
+                                    <th style="width: 150px;">SUBTOTAL SIN IVA</th>
+                                    <th style="width: 150px;">Subtotal</th>
+                                    <th class="text-center" style="width: 60px;"><i class="fas fa-cog"></i></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center my-4 p-3 bg-light rounded-3">
+                    <div class="text-end">
+                        <strong class="fs-6 text-uppercase text-muted me-2">Total Sin Iva:</strong>
+                        <span class="fs-2 fw-mono fw-bold text-success">$ <span id="totalFactura">0.00</span></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center my-4 p-3 bg-light rounded-3">
+                    <div class="text-end">
+                        <strong class="fs-6 text-uppercase text-muted me-2">Total Con Iva:</strong>
+                        <span class="fs-2 fw-mono fw-bold text-success">$ <span
+                                id="totalFacturaConIva">0.00</span></span>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end align-items-center my-4 p-3 bg-light rounded-3">
+                    <div class="text-end">
+                        <strong class="fs-6 text-uppercase text-muted me-2">Total Iva:</strong>
+                        <span class="fs-2 fw-mono fw-bold text-success">$ <span id="totalIvaFactura">0.00</span></span>
+                    </div>
+                </div>
+
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn text-white fw-bold shadow-sm py-2"
+                        style="background-color: var(--color-accent); border-radius: 8px; font-size: 1.1rem;">
+                        <i class="fas fa-check-circle me-1"></i> Asentar y Generar Factura
+                    </button>
+                </div>
+            </form>
+
+            <label for="slidebar_toggle" class="body_label"></label>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let detalles = [];
+        let catalogoData = [];
+
+        async function cargarCatalogo() {
+            try {
+                const response = await fetch('/factura/obtenerCatalogo');
+                catalogoData = await response.json();
+                console.log("Catálogo cargado:", catalogoData);
+                // Insertamos automáticamente una primera fila vacía al cargar para mejorar la UX
+                agregarFila();
+            } catch (error) {
+                console.error("Error cargando el catálogo:", error);
+            }
+        }
+
+        function agregarFila() {
+            if (catalogoData.length === 0) {
+                alert("El catálogo aún se está cargando o está vacío.");
+                return;
+            }
+
+            const tbody = document.querySelector("#tablaDetalles tbody");
+            const fila = document.createElement("tr");
+
+            const categorias = ['VACUNA', 'ALIMENTO', 'DESPARASITANTE', 'SERVICIO'];
+            let opcionesHTML = '<option value="">Selecciona un item...</option>';
+
+            categorias.forEach(cat => {
+                const itemsDeCategoria = catalogoData.filter(p => p.tipo_item === cat);
+
+                if (itemsDeCategoria.length > 0) {
+                    opcionesHTML += `<optgroup label="${cat}">`;
+                    itemsDeCategoria.forEach(p => {
+                        opcionesHTML += `<option value="${p.id}" data-precio="${p.precio}" data-stock="${p.stock}" data-iva="${p.aplica_iva}">
+                                    ${p.nombre})
+                                 </option>`;
+                    });
+                    opcionesHTML += `</optgroup>`;
+                }
+            });
+
+            fila.innerHTML = `
+        <td><select class="fk_catalogo" onchange="actualizarPrecioFila(this);actualizarIva(this)">${opcionesHTML}</select></td>
+        <td><input type="number" class="cantidad" oninput="validarStock(this)" value="0"></td>
+        <td><input type="number" class="precio" readonly value="0.00"></td>
+        <td><input type="number" class="iva" readonly value="0.00"></td>
+        <td><input type="number" class="ivaNeto" readonly value="0.00"></td>
+        <td class="subtotalSinIva">0.00</td>
+        <td class="subtotal">0.00</td>
+        <td><button type="button" onclick="this.parentElement.parentElement.remove(); actualizarTotal();">X</button></td>
+            `;
+            tbody.appendChild(fila);
+        }
+
+        window.onload = cargarCatalogo;
+
+        function calcular(input) {
+
+            const fila = input.parentElement.parentElement;
+            const cantidad = fila.querySelector(".cantidad").value || 0;
+            const precio = fila.querySelector(".precio").value || 0;
+            const ivaPorcentaje = parseFloat(fila.querySelector(".iva").value) || 0;
+
+            const subtotalBase = cantidad * precio;
+            const montoIva = subtotalBase * (ivaPorcentaje / 100);
+            const subTotalNeto = subtotalBase + montoIva;
+
+            fila.querySelector(".subtotal").innerText = subTotalNeto.toFixed(2);
+            fila.querySelector(".subtotalSinIva").innerText = subtotalBase.toFixed(2);
+
+            let iva = fila.querySelector(".ivaNeto");
+
+            if (iva) {
+
+                iva.value = montoIva.toFixed(2);
+            }
+
+            actualizarTotal();
+
+        }
+
+
+        function actualizarTotal() {
+
+            let total = 0
+            document.querySelectorAll(".subtotal").forEach(td => {
+
+                total += parseFloat(td.innerText);
+
+            });
+
+            let totalIva = 0
+
+            document.querySelectorAll(".ivaNeto").forEach(td => {
+
+                totalIva += parseFloat(td.value) || 0;
+
+            });
+
+            let totalSinIva = total - totalIva
+
+            document.getElementById("totalFactura").innerText = total.toFixed(2);
+
+            document.getElementById("totalIvaFactura").innerText = totalIva.toFixed(2);
+
+            document.getElementById("totalFacturaConIva").innerText = totalSinIva.toFixed(2);
+
+
+
+
+        }
+        document.getElementById("factura").onsubmit = async (e) => {
+
+            e.preventDefault();
+
+            const data = {
+
+                encabezado: {
+
+                    consecutivo: document.getElementById("numero_consecutivo").value,
+                    fecha: document.getElementById("fecha_expedicion").value,
+                    estado: document.getElementById("estado_pago").value,
+                    metodo: document.getElementById("metodo_pago").value,
+                    total: document.getElementById("totalFactura").innerText,
+                    fk_usuario: document.getElementById("fk_usuario").value,
+                    total_sin_iva: document.getElementById("totalFacturaConIva").innerText,
+                    total_iva: document.getElementById("totalIvaFactura").innerText,
+
+                },
+
+                detalles: []
+
+
+            };
+
+            document.querySelectorAll("#tablaDetalles tbody tr").forEach(tr => {
+
+                data.detalles.push({
+
+                    id_producto: tr.querySelector(".fk_catalogo").value,
+                    cantidad: tr.querySelector(".cantidad").value,
+                    precio: tr.querySelector(".precio").value,
+                    subtotal: tr.querySelector(".subtotal").innerText,
+                    porcentaje_iva: tr.querySelector(".iva").value,
+                    iva_total: tr.querySelector(".ivaNeto").value,
+                    subtotal_sin_iva: tr.querySelector(".subtotalSinIva").innerText
+
+                });
+
+            });
+
+            const response = await fetch('/factura/agregarFactura', {
+
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+
+            });
+
+            if (response.ok) {
+
+                alert("¡Factura agregada exitosamente!")
+
+                document.getElementById('factura').reset();
+
+                document.querySelector("#tablaDetalles tbody").innerHTML = "";
+
+                document.getElementById('totalFactura').innerHTML = '0.00';
+
+                agregarFila();
+
+            }
+
+
+        }
+
+
+
+        function validarStock(input) {
+
+            const fila = input.parentElement.parentElement;
+            const select = fila.querySelector(".fk_catalogo");
+            const opcion = select.options[select.selectedIndex];
+            const stockDisponible = parseInt(opcion.getAttribute('data-stock'));
+            const tipo = opcion.parentElement.label;
+
+            if (tipo != 'SERVICIO' && parseInt(input.value) > stockDisponible) {
+
+                alert(`¡Alerta! solo hay ${stockDisponible} unidades disponibles.`);
+                input.value = stockDisponible;
+
+            }
+
+            calcular(input);
+
+        }
+
+        function actualizarPrecioFila(selectElement) {
+            const fila = selectElement.closest("tr");
+            const opcionSeleccionada = selectElement.options[selectElement.selectedIndex];
+
+            const precio = opcionSeleccionada.getAttribute("data-precio") || 0;
+
+            const inputPrecio = fila.querySelector(".precio");
+            inputPrecio.value = precio;
+
+            const inputCantidad = fila.querySelector(".cantidad");
+            calcular(inputCantidad);
+        }
+
+
+        function actualizarIva(selectElement) {
+
+            const fila = selectElement.closest("tr");
+            const opcion = selectElement.options[selectElement.selectedIndex];
+            const ivaInput = fila.querySelector(".iva");
+
+            aplica_iva = opcion.getAttribute("data-iva");
+
+            if (aplica_iva != "NO") {
+
+                ivaInput.value = 19;
+
+            } else {
+
+                ivaInput.value = 0;
+
+            }
+
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch("/factura/obtenerUsuarios")
+                .then(response => response.json())
+                .then(clientes => {
+                    const select = document.getElementById("fk_usuario");
+                    // Opción por defecto
+                    const defOption = document.createElement("option");
+                    defOption.value = "";
+                    defOption.textContent = "Selecciona un cliente...";
+                    select.appendChild(defOption);
+
+                    clientes.forEach(cliente => {
+                        const option = document.createElement("option");
+                        option.value = cliente.id_usuario;
+                        option.textContent = cliente.nombre_completo || cliente.correo;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error cargando usuarios:", error));
+        });
+    </script>
+</body>
+
+</html>

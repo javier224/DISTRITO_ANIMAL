@@ -1,0 +1,194 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 180px;
+    font-family: Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-image: linear-gradient(0deg,rgba(0, 0, 0, 0.329),transparent), url('../img/Aspecto morfologico.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+form {
+    margin-top: 400px;
+    margin-bottom: 20px;
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    width: 500px;
+    box-shadow: 0 0 20px black;
+    border-radius: 15px;
+    background-color: #B4C1C7;
+}
+h2 {
+    text-align: center;
+    font-size: 30px;
+    text-transform: uppercase;
+    color: rgb(29, 27, 27);
+    margin-bottom: 25px;
+}
+
+input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid gray;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    background-color: whitesmoke;
+    outline: none; 
+    color: black;
+    font-size: 15PX;
+}
+
+button {
+    width: 100%;
+    height: 45px;
+    border: 1px solid gray;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    background-color: wheat;
+    outline: none; 
+    color: black;
+    font-size: 15PX;
+    margin-top: 6px;
+}
+button:hover {
+    background-color:#72CCCB;
+    border: 2px solid gray;
+    height: 50px;
+}
+
+form .icon i{
+    position: absolute;
+    margin: 12px;
+    font-size: 25px;
+    margin-top: 20px;
+}
+
+input {
+    padding-left: 40px;
+    padding-right: 30px;
+    margin-top: 6px;
+}
+
+input:hover,#estado:hover{
+    border: 3px solid gray;
+}
+#estado {
+    width: 100%;
+    height: 50px;
+    border: 1px solid gray;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    background-color: whitesmoke;
+    outline: none;
+    color: black;
+    font-size: 15PX;
+    cursor: pointer;
+    padding-left: 40px;
+    padding-right: 30px;
+    margin-top: 6px;
+}
+.nuevo:hover {
+    background-color: #0056b3;
+}
+
+
+textarea {
+    width: 100%;
+    border: 1px solid gray;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    background-color: whitesmoke;
+    outline: none; 
+    color: black;
+    font-size: 15PX;
+    padding-left: 40px;
+    padding-right: 30px;
+    margin-top: 6px;
+    resize: vertical; 
+    min-height: 50px; 
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+textarea:hover {
+    border: 3px solid gray;
+}
+
+
+
+.mensaje-error {
+    color: red;
+    font-size: 14px;
+    margin-top: -15px; 
+    margin-bottom: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.mensaje-exito {
+    color: green;
+    font-size: 14px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.mensaje-general {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+input[required]
+{
+    padding-left: 40px;
+}
+textarea[required] {
+    padding-left: 40px;
+}
+
+.invalid-feedback {
+    margin-top: -20px;
+    margin-bottom: 10px;
+}
+#nombre {
+        padding-left: 40px;
+}
+
+input[type="email"] {
+    padding-left: 40px;
+}
+
+input[type="number"] {
+    padding-left: 40px;
+}
+input[type="text"] {
+    padding-left: 40px;
+}
+input[type="url"] {
+    padding-left: 40px;
+}
+input[type="date"] {
+    padding-left: 40px;
+}
+
+textarea.form-control {
+    padding-left: 40px;
+}

@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body { 
+    font-family: 'Poppins', sans-serif; 
+}
+
+.fondo-veterinaria {
+    /* Mapea la misma imagen de fondo amigable */
+    background-image: url("../img/recuperar-contrasena.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Tarjeta premium con efecto Glassmorphism */
+.card-personalizada {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 10px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    max-width: 420px;
+    width: 100%;
+    padding: 2.5rem 2rem;
+    transition: transform 0.3s ease;
+}
+
+/* Estilizado del input con mayor grosor de borde para el foco */
+.form-control-personalizado {
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.form-control-personalizado:focus {
+    border-color: #198754; /* Cambia a verde en foco haciendo match con el botón success */
+    box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.15);
+}
+
+/* Botón estilizado */
+.btn-personalizado {
+    border-radius: 12px;
+    padding: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(25, 135, 84, 0.2);
+}
+
+.btn-personalizado:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(25, 135, 84, 0.3);
+}
+
+/* Animación sutil para el enlace de reenvío */
+.hover-link {
+    transition: color 0.2s ease;
+}
+.hover-link:hover {
+    text-decoration: underline !important;
+}

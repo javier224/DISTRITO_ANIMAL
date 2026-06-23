@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Gestión de Desparasitantes - Distrito Animal</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://kit.fontawesome.com/ff8514b855.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <script src="{{url_for('static', filename='js/validaciones.js')}}"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tablas.css') }}">
+
+    <style>
+        .fixed-bottom-end {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background-color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="checkbox" name="" id="slidebar_toggle">
+    <label for="slidebar_toggle" class="body_label"></label>
+
+    <div class="slidebar">
+        <div class="slidebar_brand">
+            <div class="brand_flex">
+                <div brand_icons>
+                    <span class="las la-bell"></span>
+                    <span class="las la-user-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sliderbar_main">
+            <div class="slidebar_user">
+                <img src="{{ url_for('static', filename='img/DA.IMG.jpg') }}" alt="User">
+                <div>
+                    <h3>DISTRITO ANIMAL</h3>
+                    <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
+                </div>
+            </div>
+
+            <div class="sliderbar_menu">
+                <div class="menu_head">
+                    <span>Dashboard</span>
+                </div>
+                <ul>
+                    <li>
+                        <a href="{% if session['id_rol'] == 1 %}{{ url_for('admin_dashboard') }}{% elif session['id_rol'] == 2 %}{{ url_for('vet_dashboard') }}{% else %}{{ url_for('cliente_dashboard') }}{% endif %}">
+                            <span class="las la-chart-pie"></span> ANALISIS
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                     <li>
+                        <a href="{{ url_for('veterinario_bp.veterinario') }}">
+                            <span class="las la-syringe"></span> VETERINARIO
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('mascota_bp.mascota')}}">
+                            <span class="las la-paw"></span> MASCOTA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('vacuna.home') }}">
+                            <span class="las la-syringe"></span> VACUNA
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('cita_bp.cita')}}">
+                            <span class="las la-calendar-alt"></span> AGENDAR CITA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('desparasitante.home') }}">
+                            <span class="las la-capsules"></span> DESPARASITACIÓN
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('servicio.home') }}">
+                            <span class="las la-concierge-bell"></span> SERVICIOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('alimento.home') }}">
+                            <span class="las la-cookie-bite"></span> ALIMENTOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('catalogo.home') }}">
+                            <span class="las la-plus-circle"></span> CATÁLOGO
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('factura.lista_factura') }}">
+                            <span class="las la-file-invoice-dollar"></span> FACTURA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="main_content">
+        
+        <header>
+            <div class="menu_toggle">
+                <label for="slidebar_toggle">
+                    <span class="las la-bars"></span>
+                </label>
+            </div>
+
+            <div class="header_icons">
+                <span class="las la-search"></span>
+                <span class="las la-bookmark"></span>
+                <form action="{{ url_for('login') }}" method="post" class="d-inline m-0">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <span class="las la-sign-out-alt" title="Cerrar Sesión" style="font-size: 1.4rem; color: var(--color-text-dark);"></span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <div class="text-center mt-5 mb-5">
+                <h1 class="display-4 fw-bold text-success">
+                    <i class="las la-capsules me-2"></i>Gestión de Desparasitantes
+                </h1>
+                <div class="mx-auto bg-success" style="height: 4px; width: 60px; border-radius: 2px;"></div>
+                <p class="text-muted mt-2">Control de antiparasitarios, dosificación por rangos de peso y vías de administración</p>
+            </div>
+
+            <div class="container">
+                <div class="mb-3 text-start">
+                    <button type="button" class="btn btn-success shadow-sm fw-bold" data-bs-toggle="modal" data-bs-target="#modalInsertar">
+                        <i class="fas fa-plus-circle me-1"></i> Agregar Desparasitante
+                    </button>
+                </div>
+
+                <div class="card shadow border-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-bordered shadow-sm">
+                                <thead class="table-success text-center">
+                                    <tr>
+                                        <th class="text-dark"># ID</th>
+                                        <th class="text-dark">Descripción</th>
+                                        <th class="text-dark">Vía de Administración</th>
+                                        <th class="text-dark">Rango de Peso</th>
+                                        <th class="text-dark">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for i in info %}
+                                    <tr class="align-middle text-center">
+                                        <td class="fw-bold">{{ i.id }}</td>
+                                        <td class="text-start">{{ i.descripcion }}</td>
+                                        <td>
+                                            <span class="badge bg-success text-white px-3 py-1">{{ i.via_administracion }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-light text-dark border"><i class="fas fa-weight me-1"></i>{{ i.rango_peso }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-success btn-sm fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalActualizar{{i.id}}">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </button>
+                                                <a href="{{ url_for('desparasitante.eliminarDesparasitante', id=i.id) }}" class="btn btn-danger btn-sm shadow-sm" onclick="return confirm('¿Eliminar este desparasitante?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="modalInsertar" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title fw-bold"><i class="fas fa-plus-circle me-2"></i>Registrar Especificación Antiparasitaria</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ url_for('desparasitante.agregarDesparasitante') }}" method="post">
+                            <div class="modal-body p-4 text-start">
+                                
+                                <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-4" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <div>El artículo desparasitante debe estar registrado previamente dentro del Catálogo General.</div>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="id" class="form-label fw-bold text-success">Selección de Artículo Relacionado</label>
+                                        <select name="id" id="id" class="form-select border-success shadow-sm" required>
+                                            <option value="" selected disabled>Selecciona un antiparasitario del catálogo...</option>
+                                            {% for item in catalogo %}
+                                            <option value="{{item['id']}}">{{item['nombre']}} (ID: {{item['id']}})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-12">
+                                        <label for="descripcion" class="form-label fw-bold text-success">Descripción Médica</label>
+                                        <input type="text" class="form-control border-success shadow-sm" id="descripcion" name="descripcion" placeholder="Ej: Tratamiento para nematodos y cestodos" required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="via_administracion" class="form-label fw-bold text-success">Vía de Administración</label>
+                                        <select name="via_administracion" id="via_administracion" class="form-select border-success shadow-sm">
+                                            <option value="ORAL" selected>ORAL</option>
+                                            <option value="TÓPICA">TÓPICA</option>
+                                            <option value="INYECTABLE">INYECTABLE</option>
+                                            <option value="OTICA">OTICA</option>
+                                            <option value="OFTALMICA">OFTALMICA</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="rango_peso" class="form-label fw-bold text-success">Rango de Peso Recomendado</label>
+                                        <input type="text" class="form-control border-success shadow-sm" id="rango_peso" name="rango_peso" placeholder="Ej: 5 - 10 kg" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-success fw-bold px-5">Guardar Desparasitante</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% for i in info %}
+            <div class="modal fade" id="modalActualizar{{i.id}}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content border-0 shadow-lg">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title fw-bold"><i class="fas fa-edit me-2"></i>Editar Desparasitante ID: {{ i.id }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <form action="{{ url_for('desparasitante.editarDesparasitante', id= i.id) }}" method="post">
+                            <div class="modal-body p-4 text-start">
+                                
+                                <div class="alert alert-warning border-0 shadow-sm d-flex align-items-center mb-3" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <div class="small">El desparasitante debe estar registrado previamente en el catálogo.</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-success">ID del Catálogo</label>
+                                    <input type="number" class="form-control border-success shadow-sm bg-light fw-bold text-muted" name="id" value="{{i.id}}" readonly>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-success">Descripción</label>
+                                    <input type="text" class="form-control border-success shadow-sm" name="descripcion" value="{{i.descripcion}}" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-success">Vía de Administración</label>
+                                    <select name="via_administracion" class="form-select border-success shadow-sm">
+                                        <option value="ORAL" {% if i.via_administracion == 'ORAL' %}selected{% endif %}>ORAL</option>
+                                        <option value="TÓPICA" {% if i.via_administracion == 'TÓPICA' %}selected{% endif %}>TÓPICA</option>
+                                        <option value="INYECTABLE" {% if i.via_administracion == 'INYECTABLE' %}selected{% endif %}>INYECTABLE</option>
+                                        <option value="OTICA" {% if i.via_administracion == 'OTICA' %}selected{% endif %}>OTICA</option>
+                                        <option value="OFTALMICA" {% if i.via_administracion == 'OFTALMICA' %}selected{% endif %}>OFTALMICA</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-success">Rango de Peso</label>
+                                    <input type="text" class="form-control border-success shadow-sm" name="rango_peso" value="{{i.rango_peso}}" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                <button type="submit" class="btn btn-success fw-bold px-4">Guardar Cambios</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

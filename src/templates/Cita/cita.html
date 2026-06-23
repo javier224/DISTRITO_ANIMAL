@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <script src="https://kit.fontawesome.com/ff8514b855.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    
+    <link rel="stylesheet" th:href="@{/css/tablas.css}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tablas.css')}}">
+
+    <title>Calendario Agendamiento Citas - Distrito Animal</title>
+
+    <style>
+        .fixed-bottom-end {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+            background-color: green;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                },
+                events: '/api/eventos',
+                selectable: true,
+
+                eventDidMount: function (info) {
+                    info.el.style.borderRadius = '8px';
+                    info.el.style.border = 'none';
+                    info.el.style.padding = '3px';
+                    info.el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                },
+
+                select: function (info) {
+                    window.location.href = "/Cita/nuevo?start=" + info.startStr;
+                },
+
+                eventClick: function (info) {
+                    var id = info.event.id;
+                    var titulo = info.event.title;
+                    var inicio = info.event.start.toLocaleString();
+                    var motivo = info.event.extendedProps.motivo || "No especificado";
+
+                    document.getElementById('infoPaciente').innerText = titulo;
+                    document.getElementById('infoInicio').innerText = inicio;
+                    document.getElementById('infoMotivo').innerText = motivo;
+
+                    document.getElementById('btnEditar').href = "/Cita/editar/" + id;
+                    
+                    // MODIFICACIÓN SEGURA EN JS: Solo asigna el href si el botón existe en el HTML
+                    var botonEliminar = document.getElementById('btnEliminar');
+                    if (botonEliminar) {
+                        botonEliminar.href = "/deleteCita/" + id;
+                    }
+
+                    var modalElement = document.getElementById('modalCita');
+                    var myModal = new bootstrap.Modal(modalElement);
+                    myModal.show();
+                }
+            });
+
+            calendar.render();
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 40px;
+            max-width: 1200px;
+        }
+
+        /* Título Principal */
+        h2.text-custom-green {
+            color: #198754;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        /* Tarjeta del Calendario */
+        #calendar {
+            background-color: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+
+        /* Botones de FullCalendar */
+        .fc-button-primary {
+            background-color: #198754 !important;
+            border-color: #198754 !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease;
+        }
+
+        .fc-button-primary:hover {
+            background-color: #146c43 !important;
+            transform: translateY(-1px);
+        }
+
+        .fc-toolbar-title {
+            color: #198754;
+            font-weight: 700 !important;
+            text-transform: capitalize;
+        }
+
+        /* Botón de Nueva Cita */
+        .btn-success-custom {
+            background-color: #198754;
+            color: white;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-weight: 600;
+            border: none;
+            transition: 0.3s;
+        }
+
+        .btn-success-custom:hover {
+            background-color: #146c43;
+            color: white;
+            box-shadow: 0 4px 12px rgba(25, 135, 84, 0.3);
+        }
+
+        /* Estilos del Modal */
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+            overflow: hidden;
+        }
+
+        .modal-header.bg-custom {
+            background-color: #198754;
+            color: white;
+            border-bottom: none;
+        }
+
+        .bg-light-details {
+            background-color: #f8fdfa;
+            border-left: 4px solid #198754;
+        }
+
+        .btn-warning-custom {
+            background-color: #ffc107;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="checkbox" name="" id="slidebar_toggle">
+    <label for="slidebar_toggle" class="body_label"></label>
+
+    <div class="slidebar">
+        <div class="slidebar_brand">
+            <div class="brand_flex">
+                <div brand_icons>
+                    <span class="las la-bell"></span>
+                    <span class="las la-user-circle"></span>
+                </div>
+            </div>
+        </div>
+
+         <div class="sliderbar_main">
+            <div class="slidebar_user">
+                <img src="{{ url_for('static', filename='img/DA.IMG.jpg') }}" alt="User">
+                <div>
+                    <h3>DISTRITO ANIMAL</h3>
+                    <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
+                </div>
+            </div>
+
+            <div class="sliderbar_menu">
+                <div class="menu_head">
+                    <span>Dashboard</span>
+                </div>
+                <ul>
+                    <li>
+                        <a href="{% if session['id_rol'] == 1 %}{{ url_for('admin_dashboard') }}{% elif session['id_rol'] == 2 %}{{ url_for('vet_dashboard') }}{% else %}{{ url_for('cliente_dashboard') }}{% endif %}">
+                            <span class="las la-chart-pie"></span> ANALISIS
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('veterinario_bp.veterinario') }}">
+                            <span class="las la-syringe"></span> VETERINARIO
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('mascota_bp.mascota')}}">
+                            <span class="las la-paw"></span> MASCOTA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('vacuna.home') }}">
+                            <span class="las la-syringe"></span> VACUNA
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('cita_bp.cita')}}">
+                            <span class="las la-calendar-alt"></span> AGENDAR CITA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('desparasitante.home') }}">
+                            <span class="las la-capsules"></span> DESPARASITACIÓN
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('servicio.home') }}">
+                            <span class="las la-concierge-bell"></span> SERVICIOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('alimento.home') }}">
+                            <span class="las la-cookie-bite"></span> ALIMENTOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('catalogo.home') }}">
+                            <span class="las la-plus-circle"></span> CATÁLOGO
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('factura.lista_factura') }}">
+                            <span class="las la-file-invoice-dollar"></span> FACTURA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="main_content">
+        
+        <header>
+            <div class="menu_toggle">
+                <label for="slidebar_toggle">
+                    <span class="las la-bars"></span>
+                </label>
+            </div>
+            <div class="header_icons">
+                <span class="las la-search"></span>
+                <span class="las la-bookmark"></span>
+                <form action="{{ url_for('login') }}" method="post" class="d-inline m-0">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <span class="las la-sign-out-alt" title="Cerrar Sesión" style="font-size: 1.4rem; color: var(--color-text-dark);"></span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <div class="container">
+                <div class="row mb-5 align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="text-custom-green">🐾 Gestión de Citas Distrito Animal</h2>
+                        <p class="text-muted">Administra la agenda médica de tus pacientes de forma visual y rápida.</p>
+                    </div>
+                   <div class="col-md-6 text-md-end d-flex justify-content-md-end gap-2 align-items-center">
+    
+                          {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                          <form action="{{ url_for('envio_masivo.enviar_recordatorios') }}" method="POST" class="m-0">
+                              <button type="submit" class="btn btn-warning fw-bold rounded-3 px-3 py-2 shadow-sm">
+                                  <i class="fas fa-paper-plane me-1"></i> Enviar Recordatorios
+                              </button>
+                          </form>
+                          {% endif %}
+                          
+                          <a href="/Cita/nuevo" class="btn btn-success-custom shadow-sm py-2">
+                              <i class="fas fa-plus me-2"></i>Nuevo Agendamiento
+                          </a>
+                     </div>
+                
+                <div id="calendar"></div>
+            </div>
+
+            <div class="modal fade" id="modalCita" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content shadow-lg">
+                        <div class="modal-header bg-custom">
+                            <h5 class="modal-title font-weight-bold">Detalles de la Cita</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body p-4">
+                            <div class="mb-4">
+                                <label class="text-uppercase small fw-bold text-muted mb-1 d-block">Paciente y Veterinario</label>
+                                <div class="d-flex align-items-center">
+                                    <strong id="infoPaciente" class="fs-4 text-dark"></strong>
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <div class="col-6">
+                                    <label class="text-uppercase small fw-bold text-muted mb-1 d-block">Horario</label>
+                                    <span id="infoInicio" class="text-dark fw-medium"></span>
+                                </div>
+                                <div class="col-6">
+                                    <label class="text-uppercase small fw-bold text-muted mb-1 d-block">Estado</label>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">Sincronizado</span>
+                                </div>
+                            </div>
+                            <div class="mb-0">
+                                <label class="text-uppercase small fw-bold text-muted mb-1 d-block">Motivo de Consulta</label>
+                                <p id="infoMotivo" class="p-3 rounded bg-light-details text-dark italic"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer bg-light border-0">
+                            <button type="button" class="btn btn-light px-4 fw-bold" data-bs-dismiss="modal">Cerrar</button>
+                            
+                            {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                            <a id="btnEliminar" href="#" class="btn btn-outline-danger px-3" onclick="return confirm('¿Estás seguro de eliminar esta cita?')">Eliminar</a>
+                            {% endif %}
+                            
+                            <a id="btnEditar" href="#" class="btn btn-warning-custom px-5 text-dark">Editar Cita</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,543 @@
+/* ========================
+   ESTILOS GLOBALES
+======================== */
+:root {
+  --color-primary: #4d8551;   /* Verde veterinaria */
+  --color-dark: #030303;
+  --color-light: #ffffff;
+  --color-gray: #bbbbbb;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background-color: var(--color-light);
+  color: var(--color-dark);
+  line-height: 1.6;
+}
+
+/* ========================
+   HEADER & NAV (MEJORADO & DINÁMICO)
+======================== */
+.main-header {
+  background-color: var(--color-dark);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 8%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Sombra elegante */
+}
+
+.logo {
+  width: 85px;
+  border-radius: 50%;
+  transition: transform 0.3s ease, border-color 0.3s;
+  border: 2px solid transparent;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+  border-color: var(--color-primary); /* Brillo con tu verde original */
+}
+
+.nav-container {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 35px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--color-light);
+  position: relative;
+  padding: 5px 0;
+  transition: color 0.3s;
+}
+
+/* Animación de línea inferior en Hover */
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--color-primary);
+}
+
+.nav-links a:hover::after {
+  width: 100%;
+}
+
+.inicio_sesion {
+  color: var(--color-light);
+  text-decoration: none;
+  background-color: var(--color-primary);
+  border-radius: 30px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 10px rgba(77, 133, 81, 0.3);
+  transition: all 0.3s ease;
+}
+
+.inicio_sesion:hover {
+  background-color: #3a6d3d;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(77, 133, 81, 0.5);
+}
+
+/* Botón Hamburguesa oculto por defecto en escritorio */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+.menu-toggle span {
+  width: 100%;
+  height: 3px;
+  background-color: var(--color-light);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+/* ========================
+   RESPONSIVE HEADER (MEDIA QUERY)
+======================== */
+@media (max-width: 850px) {
+  .menu-toggle {
+    display: flex; /* Se muestra en tablets y móviles */
+  }
+
+  /* Animación del botón hamburguesa a "X" cuando está activo */
+  .menu-toggle.active span:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+  }
+  .menu-toggle.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .menu-toggle.active span:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+
+  /* Menú desplegable lateral/cortina */
+  .nav-container {
+    position: fixed;
+    top: 0;
+    right: -100%; /* Oculto a la derecha */
+    width: 280px;
+    height: 100vh;
+    background-color: rgba(3, 3, 3, 0.98); /* Fondo oscuro con ligera opacidad */
+    flex-direction: column;
+    justify-content: center;
+    gap: 40px;
+    padding: 50px;
+    transition: right 0.4s cubic-bezier(0.1, 0.8, 0.3, 1);
+    box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+  }
+
+  /* Cuando el menú tiene la clase active, se desliza a la pantalla */
+  .nav-container.active {
+    right: 0;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    font-size: 18px;
+  }
+
+  .inicio_sesion {
+    width: 100%;
+    text-align: center;
+  }
+}
+/* ========================
+   SECCIÓN NOSOTROS
+======================== */
+.contenido-nosotros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  padding: 60px 8%;
+}
+
+.texto-nosotros {
+  flex: 1;
+  min-width: 300px;
+}
+
+.h1_noso {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: var(--color-primary);
+}
+
+.p_noso {
+  font-size: 18px;
+  color: #333;
+  text-align: justify;
+}
+
+/* Carrusel */
+.slider-box {
+    width: 100%;
+    max-width: 600px;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 20px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0,0,0,.2);
+}
+
+.slider-box ul {
+  display: flex;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  width: 500%; 
+  animation: slide 20s infinite ease-in-out;
+}
+
+.slider-box li {
+  width: 100%;
+}
+
+.slider-box img {
+  width: 100%;
+  display: block;
+  height: 350px; 
+  object-fit: cover; 
+  border-radius: 15px;
+}
+
+@keyframes slide {
+  0%    { margin-left: 0%; }
+  15%   { margin-left: 0%; }    
+  20%   { margin-left: -100%; }
+  35%   { margin-left: -100%; } 
+  40%   { margin-left: -200%; }
+  55%   { margin-left: -200%; } 
+  60%   { margin-left: -300%; }
+  75%   { margin-left: -300%; } 
+  80%   { margin-left: -400%; }
+  95%   { margin-left: -400%; } 
+  100%  { margin-left: 0%; }    
+}
+
+/* ========================
+   EQUIPO DE TRABAJO
+======================== */
+.h1-equip {
+  text-align: center;
+  margin: 60px 0 30px;
+  font-size: 40px;
+  color: var(--color-primary);
+}
+
+.member {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  padding: 20px;
+}
+
+.contenido-banner {
+  background-color: #f9f9f9;
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 280px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.contenido-banner:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+
+.member-img img {
+  width: 100%;
+  border-radius: 15px;
+  margin-bottom: 15px;
+}
+
+.redes img {
+  width: 28px;
+  margin: 0 5px;
+  transition: transform 0.3s;
+}
+
+.redes img:hover {
+  transform: scale(1.2);
+}
+
+/* ========================
+   SERVICIOS
+======================== */
+.Servicios {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 60px 8%;
+  background-color: #f5f5f5;
+  border-radius: 20px;
+  margin: 60px auto;
+}
+
+.imagen-servicios img {
+  width: 100%;
+  max-width: 550px;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+
+.texto-servicios {
+  flex: 1;
+  min-width: 280px;
+}
+
+.texto-servicios h2 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: var(--color-primary);
+  text-align: center;
+}
+
+.texto-servicios p {
+  font-size: 18px;
+  margin-bottom: 30px;
+  text-align: justify;
+}
+
+.btn_serv {
+  display: inline-block;
+  padding: 12px 25px;
+  background-color: var(--color-dark);
+  color: var(--color-light);
+  border-radius: 30px;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.btn_serv:hover {
+  background-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+/* ========================
+   FOOTER
+======================== */
+footer {
+  background-color: #030303;
+  color: var(--color-light);
+  padding: 60px 8%;
+}
+
+.footer-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-between;
+}
+
+.footer-links h4 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--color-primary);
+  display: inline-block;
+  padding-bottom: 5px;
+}
+
+.footer-links a{
+  text-decoration: none;
+}
+
+.footer-links ul li {
+  margin-bottom: 10px;
+  color: var(--color-gray);
+  cursor: pointer;
+  transition: color 0.3s, padding-left 0.3s;
+}
+
+.footer-links ul li:hover {
+  color: var(--color-light);
+  padding-left: 5px;
+}
+
+.p-footer {
+  text-align: center;
+  margin-top: 40px;
+  color: var(--color-gray);
+  font-size: 14px;
+}
+
+/* ========================
+   MEDIA QUERIES (RESPONSIVE)
+======================== */
+
+/* Tabletas y pantallas medianas (Menor a 992px) */
+@media (max-width: 992px) {
+  header {
+    padding: 15px 5%;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+
+  .contenido-nosotros, 
+  .Servicios {
+    padding: 40px 5%;
+    gap: 30px;
+  }
+
+  .h1-equip {
+    font-size: 34px;
+    margin: 40px 0 20px;
+  }
+}
+
+/* Teléfonos móviles (Menor a 768px) */
+@media (max-width: 768px) {
+  /* Header adaptable */
+  header {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px 2%;
+    text-align: center;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  .inicio_sesion {
+    width: 100%;
+    max-width: 200px;
+    text-align: center;
+    padding: 8px 15px;
+  }
+
+  /* Sección Nosotros */
+  .contenido-nosotros {
+    flex-direction: column;
+    padding: 30px 5%;
+  }
+
+  .texto-nosotros {
+    min-width: 100%;
+  }
+
+  .h1_noso {
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .p_noso {
+    font-size: 16px;
+  }
+
+  .slider-box img {
+    height: 250px; /* Altura más cómoda para celulares */
+  }
+
+  /* Equipo de Trabajo */
+  .h1-equip {
+    font-size: 28px;
+  }
+
+  .member {
+    gap: 20px;
+  }
+
+  .contenido-banner {
+    max-width: 100%;
+    width: 90%; /* Las tarjetas se adaptan al ancho de la pantalla móvil */
+  }
+
+  /* Sección Servicios */
+  .Servicios {
+    flex-direction: column-reverse; /* La imagen baja y el texto sube para mejor lectura */
+    padding: 30px 5%;
+    margin: 30px auto;
+  }
+
+  .texto-servicios h2 {
+    font-size: 28px;
+  }
+
+  .texto-servicios p {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  .texto-servicios {
+    text-align: center;
+  }
+
+  /* Footer */
+  footer {
+    padding: 40px 5%;
+  }
+
+  .footer-row {
+    flex-direction: column;
+    text-align: center;
+    gap: 25px;
+  }
+
+  .footer-links h4 {
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+}
+
+/* Teléfonos muy pequeños (Menor a 480px) */
+@media (max-width: 480px) {
+  .logo {
+    width: 75px;
+  }
+
+  .slider-box img {
+    height: 180px;
+  }
+}

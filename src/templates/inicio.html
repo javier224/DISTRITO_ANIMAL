@@ -1,0 +1,262 @@
+
+    
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>inicio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css')}}">
+</head>
+
+<body>
+   <header class="main-header">
+        <a href="/">
+            <img src="{{ url_for('static', filename='/img/DA.IMG.jpg')}}" class="logo" alt="Distrito Animal">
+        </a>
+        
+        <!-- Botón Hamburguesa para Móviles -->
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Contenedor de navegación que se animará en móviles -->
+        <div class="nav-container" id="nav-container">
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">INICIO</a></li>
+                    <li><a href="{{ url_for('servicios') }}">SERVICIOS</a></li>
+                    <li><a href="{{ url_for('contactanos') }}">CONTACTANOS</a></li>
+                </ul>
+            </nav>
+            <a href="{{ url_for('login') }}" class="inicio_sesion">INICIAR SESIÓN</a>
+        </div>
+    </header>
+
+    <div class="contenido-nosotros">
+        <div class="texto-nosotros">
+            <h1 class="h1_noso">NOSOTROS</h1>
+            <br>
+            <p class="p_noso">En Distrito Animal, creemos que las mascotas no son solo animales, son parte de nuestra
+                familia. Desde
+                que abrimos nuestras puertas en 2014 bajo la visión de nuestro equipo de trabajo de ofrecer una atención
+                médica excepcional con el corazón, nos hemos dedicado a la
+                salud y el bienestar de cada animal que entra por nuestra puerta.
+                <br>
+                Nuestra misión es simple: proporcionar el cuidado veterinario más compasivo y de la más alta calidad a
+                sus
+                queridos compañeros, educando a los dueños y fomentando una relación duradera basada en la confianza y
+                el
+                respeto mutuo.
+            </p>
+
+        </div>
+    
+
+        <div class="slider-box">
+    
+            <ul>
+    
+                <li>
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='/img/carrousel 1.jpg')}}" alt="Mascota 1">
+                    </a>
+                </li>
+        
+                <li>
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='/img/image_2026-05-27_112335617.png')}}" alt="Mascota 2">
+                    </a>
+                </li>
+        
+                <li>
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='/img/carrousel 3.jpg')}}" alt="Mascota 3">
+                    </a>
+                </li>
+
+                <li>
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='/img/corruselnew1(1).png')}}" alt="Mascota 3">
+                    </a>
+                </li>
+
+                 <li>
+                    <a href="#">
+                        <img src="{{ url_for('static', filename='/img/perro-carrusel2.jpg.jpeg')}}" alt="Mascota 3">
+                    </a>
+                </li>
+    
+            </ul>
+    
+        </div>
+
+</div>
+    </div>
+
+        <div class="div_text_equ">
+            <h1 class="h1-equip">EQUIPO DE TRABAJO</h1>
+        </div>
+
+        <section id="member" class="member">
+
+            <div class="contenido-banner">
+                <div class="member-img">
+                    <img class="member-img" src="{{ url_for('static', filename='/img/veterinarianew1.png')}}" alt="">
+                </div>
+                <h1>Sofia López</h1>
+                <h2>Auxiliar y groomer</h2>
+                <div class="redes">
+                    <a href=""><img
+                            src="img/facebook-brands.svg" alt="" style="width: 8%;"></i></a>
+                    <a href=""><img
+                            src="img/square-instagram-brands.svg" alt="" style="width: 8%;"></i></a>
+                </div>
+
+            </div>
+
+            <div class="contenido-banner">
+                <div class="member-img">
+                    <img class="member-img" src="{{ url_for('static', filename='/img/veterinarionew2.png')}}" alt="">
+                </div>
+                    <h1>Martin Quintero</h1>
+                    <h2>Cirujano y especialista</h2>
+                    <div class="redes">
+                        <a href=""><img
+                                src="{{ url_for('static', filename='img/facebook-brands.svg') }}" alt="" style="width: 8%;"></i></a>
+                        <a href=""><img
+                                src="{{ url_for('static', filename='img/square-instagram-brands.svg') }}" alt="" style="width: 8%;"></i></a>
+                    </div>
+            </div>
+
+             <div class="contenido-banner">
+                <div class="member-img">
+                    <img class="member-img" src="{{ url_for('static', filename='/img/Veterinarianew3.png')}}" alt="">
+                </div>
+                    <h1>Milena Cifuentes</h1>
+                    <h2>Recepcionista veterinaria</h2>
+                    <div class="redes">
+                        <a href=""><img
+                                src="{{ url_for('static', filename='img/facebook-brands.svg') }}" alt="" style="width: 8%;"></i></a>
+                        <a href=""><img
+                                src="{{ url_for('static', filename='img/square-instagram-brands.svg') }}" alt="" style="width: 8%;"></i></a>
+                    </div>
+            </div>
+        </section>
+        <div class="Servicios">
+            <div class="imagen-servicios">
+                <img src="{{ url_for('static', filename='/img/img-2.jpg')}}" alt="imagen de referencia veterinaria">
+            </div>
+            <div class="texto-servicios">
+                <h2>SERVICIOS</h2>
+                <p>Conoce la variedad de servicios que el equipo profesional de nuestra clínica veterinaria ofrece para
+                    el bienestar y la salud de tu mascota:</p>
+                <a href="{{ url_for('servicios') }}">
+                    <button class="btn_serv">CONOCE MAS</button>
+                </a>
+            </div>
+        </div>
+    
+
+
+    <footer class="footer">
+        <div class="container-footer">
+            <div class="footer-row">
+                <div class="footer-links">
+                    <h4>Distrito Animal</h4>
+                    <ul>
+                        <a href="{{ url_for('index') }}">
+                            <li>Inicio</li>
+                        </a>
+
+                        <a href="{{ url_for('servicios') }}">
+                            <li>Servicios</li>
+                        </a>
+
+                        <a href="{{ url_for('contactanos') }}">
+                            <li>Contactanos</li>
+                        </a>
+
+                        <a href="{{ url_for('login') }}">
+                            <li>Registrate</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-links">
+                    <h4>Ayuda</h4>
+                    <ul>
+                        <a href="tel:+6016745375" target="_blank">
+                            <li>Telefono: 3224577898</li>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=VetDistriAnimal@gmail.com&su=Asunto&body=Mensaje" target="_blank">
+                            <li>email: distrianimal@gmail.com</li>
+                        </a>
+
+                        <a href="https://wa.me/573208478040?text=Hola,%20quiero%20más%20información" target="_blank">
+                            <li>whatsapp:3208478040</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+                <div class="footer-links">
+                    <h4>Siguenos</h4>
+                    <ul>
+                        <a href="https://www.facebook.com/VetDistritoAnimal?locale=es_LA" target="_blank">
+                            <li>Facebook</li>
+                        </a>
+                        <a href="https://www.instagram.com/vetdistritoanimal/" target="_blank">
+                            <li>Instagram</li>
+                        </a>
+                        <a href="https://x.com/vDistritoAnimal" target="_blank">
+                            <li>X</li>
+                        </a>
+                        <a href="https://www.tiktok.com/@vet.distritoanimal" target="_blank">
+                            <li>Tiktok</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+        <center>
+            <p class="p-footer">© Creado y desarrollado por grupo scrum 5</p>
+        </center>
+
+    </footer>
+
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navcontainer = document.getElementById('nav-container');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navcontainer.classList.toggle('active');
+        });
+
+        // Opcional: Cerrar el menú si se hace clic en un enlace
+        const navLinks = document.querySelectorAll('.nav-links a, .inicio_sesion');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navcontainer.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+
+</body>
+
+</html>

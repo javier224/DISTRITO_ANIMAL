@@ -1,0 +1,556 @@
+/* ==========================================================================
+   ESTILOS CORE Y VARIABLES GLOBAL
+   ========================================================================== */
+:root {
+    --color-main: #1a202e; /* Azul marino pizarra elegante */
+    --color-accent: #10b981; /* Verde esmeralda */
+    --color-bg-light: #f8fafc; 
+    --color-text-dark: #0f172a;
+    --color-text-muted: #64748b;
+    --border-radius: 12px;
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+    text-decoration: none !important;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+#slidebar_toggle {
+    display: none;
+}
+
+/* Capa oscura trasera para cerrar el menú en móviles */
+.body_label {
+    display: none;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    z-index: 998; /* Justo debajo del sidebar */
+    left: 0;
+    top: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s ease;
+}
+
+/* --- Control Nactivo de Sidebar --- */
+#slidebar_toggle:checked ~ .slidebar { 
+    left: -280px;
+}
+
+#slidebar_toggle:checked ~ .main_content header { 
+    left: 0;
+    width: 100%;
+}
+
+#slidebar_toggle:checked ~ .main_content { 
+    margin-left: 0;
+}
+
+/* --- Sidebar --- */
+.slidebar {
+    width: 280px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    padding: 1.5rem 1.2rem;
+    background: var(--color-main);
+    color: #fff;
+    z-index: 1040; /* Compatibilidad con componentes Bootstrap */
+    transition: left 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+}
+
+.slidebar_brand {
+    height: 60px;
+    margin-bottom: 2rem;
+}
+
+.brand_flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.slidebar_user {
+    margin: 1.5rem 0;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 1.5rem 1rem;
+    border-radius: var(--border-radius);
+}
+
+.slidebar_user img {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 3px solid var(--color-accent);
+    object-fit: cover;
+    margin-bottom: 0.8rem;
+}
+
+.slidebar_user h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.slidebar_user span {
+    font-size: 0.80rem;
+    color: #94a3b8;
+    display: block;
+    word-break: break-all;
+}
+
+.user_actions {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.user_actions a {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.8rem !important;
+    background: rgba(255, 255, 255, 0.05);
+    color: #cbd5e1 !important;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.user_actions a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff !important;
+}
+
+.user_actions a span {
+    font-size: 1.1rem !important;
+    margin: 0 !important;
+}
+
+.slidebar_menu {
+    margin-top: 2rem;
+}
+
+.menu_head {
+    text-transform: uppercase;
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    margin-bottom: 1.2rem;
+    padding-left: 0.5rem;
+}
+
+.slidebar ul {
+    margin-bottom: 1.5rem;
+}
+
+.slidebar li {
+    margin-bottom: 0.6rem;
+}
+
+.slidebar a {
+    color: #cbd5e1;
+    font-size: 1.05rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    padding: 0.9rem 1.2rem;
+    border-radius: 10px;
+    transition: all 0.2s ease-in-out;
+}
+
+.slidebar a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.slidebar li span {
+    font-size: 1.7rem;
+    margin-right: 1.1rem;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* --- Header Superior --- */
+header {
+    height: 70px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 0 1.5rem;
+    position: fixed;
+    left: 280px;
+    width: calc(100% - 280px);
+    top: 0;
+    z-index: 1030;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: left 300ms ease, width 300ms ease;
+}
+
+.menu_toggle label {
+    height: 40px;
+    width: 40px;
+    display: grid;
+    place-items: center;
+    font-size: 1.3rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    background: #f1f5f9;
+}
+
+.menu_toggle label:hover {
+    background: #e2e8f0;
+}
+
+.header_icons {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.header_icons span {
+    font-size: 1.3rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.header_icons span:hover {
+    color: var(--color-text-dark);
+}
+
+/* --- Main Layout --- */
+.main_content {
+    margin-left: 280px;
+    transition: margin-left 300ms ease;
+}
+
+main {
+    padding: 1.5rem;
+    background: var(--color-bg-light);
+    min-height: calc(100vh - 70px);
+    margin-top: 70px;
+}
+
+.page_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.page_header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+.page_header small {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+/* --- Módulos de Analítica --- */
+.cards_grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.card_single {
+    background: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    border: 1px solid #f1f5f9;
+}
+
+.card_flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card_head span {
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+}
+
+.card_info h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0.3rem 0;
+}
+
+.btn-reporte-verde {
+    background-color: var(--color-accent);
+    color: white !important;
+    padding: 0.55rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease-in-out;
+    border: none;
+}
+
+.btn-reporte-verde:hover {
+    background-color: #0e9f6e;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.card_chart span {
+    font-size: 2rem;
+    padding: 0.8rem;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.card_chart.success span {
+    color: var(--color-accent);
+    background: #ecfdf5;
+}
+
+.card_chart.warning span {
+    color: #f59e0b;
+    background: #fffbeb;
+}
+
+/* --- Grid de Personal e Informes --- */
+.jobs_grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    grid-gap: 1.5rem;
+    align-items: start;
+}
+
+.job_card {
+    background: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    border: 1px solid #f1f5f9;
+    text-align: center;
+}
+
+.jobs_head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.jobs_head h1 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+}
+
+.analytics_chart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart_circle {
+    height: 130px;
+    width: 130px;
+    border: 10px solid #e2e8f0;
+    border-top: 10px solid var(--color-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin-bottom: 1rem;
+}
+
+.chart_circle h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin: 0;
+}
+
+/* --- Panel de Tablas Cortas Internas --- */
+.jobs {
+    background: #fff;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+    border-radius: var(--border-radius);
+    border: 1px solid #f1f5f9;
+}
+
+.jobs h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 1.5rem;
+}
+
+.jobs h2 small {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+    margin-top: 0.2rem;
+}
+
+.table_responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.jobs table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.jobs table td {
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.jobs table tr:last-child td {
+    border-bottom: none;
+}
+
+.jobs table td button {
+    background: #f1f5f9;
+    color: var(--color-text-dark);
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.jobs table td button:hover {
+    background: var(--color-main);
+    color: #fff;
+}
+
+
+/* ==========================================================================
+   MEDIA QUERIES - RESPONSIVE COMPLETO
+   ========================================================================== */
+
+@media only screen and (max-width: 1200px) {
+    .jobs_grid {
+        grid-template-columns: 100%; /* El gráfico circular pasa arriba de la tabla */
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    /* Escondemos el sidebar por defecto a la izquierda */
+    .slidebar {
+        left: -280px;
+        z-index: 1060; /* Capa más alta para el menú */
+    }
+    .main_content {
+        margin-left: 0;
+    }
+    header {
+        left: 0;
+        width: 100%;
+        z-index: 1040; /* El header se queda abajo para que no estorbe */
+    }
+    
+    /* CAPA OSCURA TRASERA: Ahora cubre absolutamente todo el fondo */
+    .body_label {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(3px);
+        z-index: 1050; /* JUSTO ABAJO de la barra lateral, pero ARRIBA del contenido */
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    /* CUANDO EL MENÚ SE ABRE: Controlamos la visibilidad y el flujo */
+    #slidebar_toggle:checked ~ .slidebar {
+        left: 0;
+    }
+    
+    /* Activamos la capa de escape visualmente */
+    #slidebar_toggle:checked ~ .body_label {
+        display: block;
+        opacity: 1;
+    }
+
+    /* Evitamos que el header se mueva o tire saltos raros en móviles */
+    #slidebar_toggle:checked ~ .main_content header {
+        left: 0;
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    main {
+        padding: 1rem;
+    }
+    .cards_grid {
+        grid-template-columns: 100%; /* Las tarjetas analíticas se apilan verticalmente */
+        grid-gap: 1rem;
+    }
+    .page_header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .page_header h1 {
+        font-size: 1.3rem;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+    header {
+        padding: 0 1rem;
+    }
+    .card_info h2 {
+        font-size: 1.5rem; /* Ajuste para evitar desborde de números grandes */
+    }
+    .btn-reporte-verde {
+        width: 100%;
+        justify-content: center; /* Botón de reporte a ancho completo en celulares */
+    }
+    .card_flex {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .card_chart {
+        align-self: flex-end; /* Icono abajo a la derecha en pantallas compactas */
+    }
+}

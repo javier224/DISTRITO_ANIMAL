@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tablas.css') }}">
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+
+
+    <style>
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #198754;
+            /* verde Bootstrap */
+            box-shadow: 0 0 8px rgba(25, 135, 84, 0.4);
+        }
+
+        .btn-success:hover {
+            background-color: #145c32;
+            border-color: #145c32;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(25, 135, 84, 0.1);
+            /* verde suave */
+            transform: scale(1.01);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Contenedor de botones en columna */
+        .btn-group-vertical-custom {
+            display: flex;
+            flex-direction: column;
+            /* apila verticalmente */
+            gap: 8px;
+            /* espacio entre botones */
+            align-items: stretch;
+            /* que ocupen el mismo ancho */
+        }
+
+        /* Estilo base para ambos */
+        .btn-custom {
+            min-width: 160px;
+            min-height: 40px;
+            margin-top: 10px;
+            /* ancho mínimo uniforme */
+            color: #fff;
+            border: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        /* Botón Ver Detalles */
+        .btn-ver {
+            background-color: #2e7d32;
+        }
+
+        .btn-ver:hover {
+            background-color: #1b5e20;
+            transform: scale(1.03);
+        }
+
+        /* Botón Descargar PDF */
+        .btn-descargar {
+            background-color: #388e3c;
+        }
+
+        .btn-descargar:hover {
+            background-color: #2c6b2f;
+            transform: scale(1.03);
+        }
+
+        .btn-success {
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        /**botón agregar*/
+
+        .btn-agregar {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #28a745;
+            /* verde */
+            color: #fff;
+            /* letras blancas */
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-agregar:hover {
+            background-color: #218838;
+            /* verde más oscuro */
+            transform: scale(1.05);
+            /* efecto de agrandarse */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* sombra atractiva */
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+            /* verde más oscuro */
+            transform: scale(1.05);
+            /* efecto de agrandarse */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            /* sombra atractiva */
+        }
+    </style>
+
+</head>
+
+<body>
+    <input type="checkbox" name="" id="slidebar_toggle">
+    <div class="main_content">
+        <header>
+            <div class="menu_toggle">
+                <label for="slidebar_toggle">
+                    <span class="las la-bars"></span>
+                </label>
+            </div>
+
+            <div class="header_icons">
+                <span class="las la-bookmark"></span>
+                <form action="{{ url_for('login') }}" method="post" style="display: inline;">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                        <span class="las la-sign-out-alt" title="Cerrar Sesión"></span>
+                    </button>
+                </form>
+            </div>
+        </header>
+    </div>
+
+
+    <div class="slidebar">
+        <div class="slidebar_brand">
+            <div class="brand_flex">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" width="30px" alt="Logo">
+                <div brand_icons>
+                    <span class="las la-bell"></span>
+                    <span class="las la-user-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sliderbar_main">
+            <div class="slidebar_user">
+                <img src="{{ url_for('static', filename='img/DA.IMG.jpg') }}" alt="User">
+                <div>
+                    <h3>DISTRITO ANIMAL</h3>
+                    <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
+                </div>
+            </div>
+
+            <div class="sliderbar_menu">
+                <div class="menu_head">
+                    <span>Dashboard</span>
+                </div>
+                <ul>
+                    <li>
+                        <a
+                            href="{% if session['id_rol'] == 1 %}{{ url_for('admin_dashboard') }}{% elif session['id_rol'] == 2 %}{{ url_for('vet_dashboard') }}{% else %}{{ url_for('cliente_dashboard') }}{% endif %}">
+                            <span class="las la-chart-pie"></span> ANALISIS
+                        </a>
+                    </li>
+                </ul>
+                <ul>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('veterinario_bp.veterinario') }}">
+                            <span class="las la-syringe"></span> VETERINARIO
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li><a href="{{url_for('mascota_bp.mascota')}}">
+                            <span class="las la-paw"></span> MASCOTA</a></li>
+
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('vacuna.home') }}">
+                            <span class="las la-syringe"></span> VACUNA
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{url_for('cita_bp.cita')}}">
+                            <span class="las la-calendar-alt"></span> AGENDAR CITA
+                        </a>
+                    </li>
+                    {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                    <li>
+                        <a href="{{ url_for('desparasitante.home') }}">
+                            <span class="las la-capsules"></span> DESPARASITACIÓN
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li>
+                        <a href="{{ url_for('servicio.home') }}">
+                            <span class="las la-concierge-bell"></span> SERVICIOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('alimento.home') }}">
+                            <span class="las la-cookie-bite"></span> ALIMENTOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('catalogo.home') }}">
+                            <span class="las la-plus-circle"></span> CATÁLOGO
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for('factura.lista_factura') }}">
+                            <span class="las la-file-invoice-dollar"></span> FACTURA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="main_content">
+
+
+        <main>
+
+            <header>
+                <div class="menu_toggle">
+                    <label for="slidebar_toggle">
+                        <span class="las la-bars"></span>
+                    </label>
+                </div>
+
+                <div class="header_icons">
+                    <span class="las la-bookmark"></span>
+                    <form action="{{ url_for('login') }}" method="post" class="d-inline m-0">
+                        <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                            <span class="las la-sign-out-alt" title="Cerrar Sesión"
+                                style="font-size: 1.4rem; color: var(--color-text-dark);"></span>
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+
+
+
+            <div class="table-container">
+
+                <!-- Modal -->
+                <div class="modal fade" id="modalVerDetalles" data-bs-backdrop="static" data-bs-keyboard="false"
+                    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="staticBackdropLabel">Detalles de la factura</h1>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3 p-2 border-bottom">
+
+                                    <p><strong>número consecutivo</strong> <span id="spanConsecutivo"></span></p>
+
+                                </div>
+                            </div>
+
+                            <div class="table-resonsive">
+
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio unitario</th>
+                                            <th>porcentaje iva</th>
+                                            <th>Iva neto</th>
+                                            <th>subtotal sin iva</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cuerpoDetalles">
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                            <div class="modal-footer">
+                                <!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>-->
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="container">
+                    <!-- <h2>📋 Listado de Facturas</h2>-->
+
+                    <div class="container my-5">
+
+                        <div class="row justify-content-center">
+                            <div class="col-md-10 col-lg-8">
+                                {% if session['id_rol'] in [1, 2] %}
+                                <a href="{{ url_for('factura.home') }}"
+                                    class="btn btn-success btn-lg position-fixed top-10 end-0 me-3 mt-3 d-inline-flex align-items-center">
+                                    <i class="fas fa-home me-2"></i> Agregar Factura
+                                </a>
+                                {% endif %}
+                                <table
+                                    class="table table-bordered table-hover shadow rounded bg-white align-middle text-center">
+                                    <thead class="table-success text-dark">
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th># Consecutivo</th>
+                                            <th>Fecha de expedición</th>
+                                            <th>Estado de pago</th>
+                                            <th>Método de pago</th>
+                                            <th>Total sin Iva</th>
+                                            <th>Total Iva</th>
+                                            <th>Total</th>
+                                            <th>Acciones</th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+
+                                        {% for factura in facturas %}
+
+                                        <tr>
+                                            <td>{{factura.nombre_Clientes}}</td>
+                                            <td><strong>FAC-{{ factura.numero_consecutivo }}</strong></td>
+                                            <td>{{ factura.fecha_expedicion }}</td>
+                                            <td>{{ factura.estado_pago }}</td>
+                                            <td>{{ factura.metodo_pago }}</td>
+                                            <td>{{factura.total_Sin_Iva}}</td>
+                                            <td>{{factura.total_iva}}</td>
+                                            <td>{{factura.total}}</td>
+                                            <td>
+                                                <div class="btn-group-custom">
+                                                    <button class="btn btn-sm btn-custom btn-ver"
+                                                        onclick="verDetalles('{{ factura.id }}', '{{ factura.numero_consecutivo }}')">
+                                                        👁️ Ver Detalles
+                                                    </button>
+                                                    <a href="{{ url_for('facturaPdf.descargarPdf', id=factura.id) }}"
+                                                        class="btn btn-sm btn-custom btn-descargar d-block text-center">
+                                                        Descargar PDF 📄
+                                                    </a>
+
+                                                    <button type="button" class="btn btn-sm btn-custom btn-ver"
+                                                        data-bs-toggle="modal" data-bs-target="#modalEstadoFactura"
+                                                        data-num="{{factura.numero_consecutivo}}"
+                                                        data-estado="{{factura.estado_pago}}" data-id={{factura.id}}>
+                                                        Cambiar estado
+                                                    </button>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+    </div>
+
+    </main>
+    </div>
+
+    <!--MODAL PARA AJUSTAR ESTADO DE LA FACTURA-->
+
+    <div class="modal fade" id="modalEstadoFactura" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0 rounded-3">
+
+                <!-- Encabezado -->
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title fw-bold" id="staticBackdropLabel">
+                        Cambiar estado de la factura <span id="facturaNum"
+                            class="badge bg-light text-success ms-2"></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Formulario -->
+                <form id="EstadoFactura" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="estado_pago" class="form-label fw-semibold text-success">Estado del pago</label>
+                            <select name="estado_pago" id="estado_pago"
+                                class="form-select border-success shadow-sm rounded-pill">
+                                <option value="PAGADA"> PAGADA</option>
+                                <option value="PENDIENTE"> PENDIENTE</option>
+                                <option value="ANULADA"> ANULADA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Footer con botones -->
+                    <div class="modal-footer d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal" id="cancelarBtn">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-success rounded-pill px-4 shadow-sm" id="guardarBtn">
+                            Guardar cambios
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+
+        async function verDetalles(idFactura, consecutivo) {
+
+            document.getElementById("spanConsecutivo").innerHTML = consecutivo;
+
+            const tbody = document.getElementById("cuerpoDetalles");
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Cargando detalles...</td></tr>';
+
+            const miModal = new bootstrap.Modal(document.getElementById('modalVerDetalles'));
+            miModal.show();
+
+            try {
+
+                const response = await fetch(`/factura/detallesFactura/${idFactura}`);
+                const detalles = await response.json();
+
+                tbody.innerHTML = "";
+
+                if (detalles.length === 0) {
+
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center">No hay detalles para esta factura.</td></tr>';
+                    return;
+
+                }
+
+                detalles.forEach(d => {
+
+                    const fila = `
+                    
+                        <tr>
+                            <td>${d.nombre}</td>
+                            <td>${d.cantidad}</td>
+                            <td>${parseFloat(d.precio_unitario).toFixed(2)}</td>
+                            <td>${d.porcentaje_iva}</td>
+                            <td>${parseFloat(d.total_iva).toFixed(2)}</td>
+                            <td>${parseFloat(d.subtotal_Sin_Iva).toFixed(2)}</td>
+                            <td><strong>${parseFloat(d.subtotal).toFixed(2)}<strong></td>
+                        </tr>
+
+                    `;
+                    tbody.innerHTML += fila;
+
+                });
+
+            }
+
+            catch (error) {
+
+                console.error("Error:", error);
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger"> Error al conectar con el servidor. </td></tr>';
+
+            }
+
+            const btnPdf = document.getElementById('btnDescargarPDF');
+            btnPdf.href = `/facturaPdf/descargarPdf/${idFactura}`;
+
+        }
+
+        /*PARA ABRIR EL SUBMENÚ DE GESTIÓN PRODUCTO*/
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const submenuToggle = document.querySelector(".slidebar li.submenu > a");
+            const submenuParent = submenuToggle.parentElement;
+
+            submenuToggle.addEventListener("click", function (e) {
+                e.preventDefault(); // evita que recargue la página
+                submenuParent.classList.toggle("open");
+            });
+        });
+
+        const modalEstadoFactura = document.getElementById('modalEstadoFactura');
+        modalEstadoFactura.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // el botón que abrió el modal
+            const num = button.getAttribute('data-num'); // el consecutivo
+            const estado = button.getAttribute('data-estado'); //estado del pago actual
+            const id = button.getAttribute('data-id');
+
+            const guardarBtn = modalEstadoFactura.querySelector("#guardarBtn");
+            const cancelarBtn = modalEstadoFactura.querySelector("#cancelarBtn")
+
+
+            const facturaNum = modalEstadoFactura.querySelector('#facturaNum');
+            facturaNum.textContent = num; // lo insertamos en el título
+
+            const selectEstado = modalEstadoFactura.querySelector('#estado_pago');
+
+            if (selectEstado) {
+                selectEstado.value = estado;
+
+                if (estado === "ANULADA" || estado === "PAGADA") {
+                    // Limpiar todas las opciones
+                    selectEstado.innerHTML = "";
+
+                    // Crear una opción fija con el estado actual
+                    const option = document.createElement("option");
+                    option.value = estado;
+                    option.textContent = estado;
+                    option.selected = true;
+
+                    // Insertar la opción en el select
+                    selectEstado.appendChild(option);
+
+                    // Deshabilitar el select para que no se cambie
+                    selectEstado.disabled = true;
+
+                    // Ocultar el botón de guardar
+                    const guardarBtn = modalEstadoFactura.querySelector('#guardarBtn');
+                    if (guardarBtn) guardarBtn.style.display = "none";
+
+                    // Cambiar el botón cancelar a "Volver"
+                    const cancelarBtn = modalEstadoFactura.querySelector('#cancelarBtn');
+                    if (cancelarBtn) cancelarBtn.textContent = "Volver";
+                } else {
+                    // Restaurar opciones si está pendiente
+                    selectEstado.innerHTML = `
+                        <option value="PAGADA"> PAGADA</option>
+                        <option value="PENDIENTE"> PENDIENTE</option>
+                        <option value="ANULADA"> ANULADA</option>
+                    `;
+                    selectEstado.value = estado;
+                    selectEstado.disabled = false;
+
+                    // Mostrar el botón de guardar
+                    const guardarBtn = modalEstadoFactura.querySelector('#guardarBtn');
+                    if (guardarBtn) guardarBtn.style.display = "inline-block";
+
+                    // Restaurar el botón cancelar
+                    const cancelarBtn = modalEstadoFactura.querySelector('#cancelarBtn');
+                    if (cancelarBtn) cancelarBtn.textContent = "Cancelar";
+                }
+
+                if (selectEstado) {
+                    selectEstado.value = estado;
+
+                    if (estado === "ANULADA") {
+                        // Si ya está anulada, no se puede cambiar
+                        selectEstado.disabled = true;
+
+                    } else if (estado === "PAGADA") {
+                        // Si está pagada, permitir solo pasar a ANULADA
+                        selectEstado.disabled = false;
+
+                        // Opcional: limitar las opciones a PAGADA y ANULADA
+                        selectEstado.innerHTML = `
+                            <option value="PAGADA"> PAGADA</option>
+                            <option value="ANULADA"> ANULADA</option>
+                        `;
+                        selectEstado.value = estado;
+
+                        const guardarBtn = modalEstadoFactura.querySelector('#guardarBtn');
+                        if (guardarBtn) guardarBtn.style.display = "inline-block";
+
+                    } else {
+                        // Si está pendiente, se puede cambiar libremente
+                        selectEstado.disabled = false;
+                    }
+                }
+
+            }
+
+            const form = modalEstadoFactura.querySelector('#EstadoFactura');
+            form.action = `/factura/cambiarEstado/${id}`;
+        });
+
+    </script>
+
+</body>
+
+</html>

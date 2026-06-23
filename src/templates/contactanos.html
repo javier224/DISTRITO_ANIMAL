@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_Contactanos.css')}} ">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_index.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <title>Contactanos</title>
+
+
+</head>
+
+<body>
+
+    <header class="main-header">
+        <a href="/">
+            <img src="{{ url_for('static', filename='/img/DA.IMG.jpg')}}" class="logo" alt="Distrito Animal">
+        </a>
+        
+        <!-- Botón Hamburguesa para Móviles -->
+        <button class="menu-toggle" id="menu-toggle" aria-label="Abrir menú">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <!-- Contenedor de navegación que se animará en móviles -->
+        <div class="nav-container" id="nav-container">
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="{{ url_for('index') }}">INICIO</a></li>
+                    <li><a href="{{ url_for('servicios') }}">SERVICIOS</a></li>
+                    <li><a href="{{ url_for('contactanos') }}">CONTACTANOS</a></li>
+                </ul>
+            </nav>
+            <a href="{{ url_for('login') }}" class="inicio_sesion">INICIAR SESIÓN</a>
+        </div>
+    </header>
+
+    <section class="map">
+
+        <div class="text_map">
+
+            <h2>VISITANOS</h2>
+
+            <p>Te invitamos a conocer nuestra sede ubicada en Kennedy central, allí tu peludito podrá disfrutar todos
+                los
+                servicios que tenemos disponibles para ellos, además de que podrás conseguir una gran variedad de
+                productos que tenemos
+                para que concientas a tu amigo peludo como se lo merece.
+            </p>
+
+            <p><i class="fa-solid fa-location-dot" style="color: green; font-size: 30px;"></i> Cl. 35A Sur #77-31 sur,
+                Kennedy, Bogotá, Cundinamarca</p>
+
+        </div>
+
+        <div class="mapa">
+
+            <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3976.838731146352!2d-74.15113852539923!3d4.
+            62284519535189!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e3f9e98b0b91a29%3A0x2ce8f2af9ae516d!2sVet%20distr
+            ito%20animal!5e0!3m2!1ses-419!2sco!4v1751147302694!5m2!1ses-419!2sco"
+                width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+
+        </div>
+
+    </section>
+
+    <section class="Contacto">
+                <div class="intro_contacto">
+                    <h2>COMUNÍCATE CON NUESTRO EQUIPO</h2>
+                    <p>Estamos disponibles para resolver tus dudas y cuidar de tus mascotas.</p>
+                </div>
+
+                <br>
+                <br>
+        
+                <div class="forma_contacto">
+            
+                    <div class="contacto-cards">
+                        <a href="https://wa.me/573208478040?text=Hola,%20quiero%20más%20información" target="_blank" class="card-link">
+                            <div class="card-contacto chat">
+                                <i class="fa-brands fa-whatsapp"></i>
+                                <div>
+                                    <h3>CHATEA CON NOSOTROS</h3>
+                                    <span>(+57) 320 847 8040</span>
+                                </div>
+                            </div>
+                        </a>
+            
+                        <a href="tel:+6016745375" class="card-link">
+                            <div class="card-contacto marcar">
+                                <i class="fa-solid fa-phone-volume"></i>
+                                <div>
+                                    <h3>LLÁMANOS</h3>
+                                    <span>(+601) 67 45 375</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="contacto-cards" style="margin-top: 20px;">
+    
+                            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=VetDistriAnimal@gmail.com&su=Asunto&body=Mensaje" target="_blank" class="card-link">
+                                <div class="card-contacto">
+                                    <i class="fa-solid fa-paper-plane"></i>
+                                    <div>
+                                        <h3>Gmail</h3>
+                                        <span>VetDistriAnimal@gmail.com</span>
+                                    </div>
+                                </div>
+                            </a>
+                         
+                            <a href="https://outlook.live.com/mail/0/deeplink/compose?to=AtenCliDistriAnimal@outlook.es&subject=Asunto&body=Mensaje" target="_blank" class="card-link">
+                                <div class="card-contacto">
+                                    <i class="fa-solid fa-at"></i>
+                                    <div>
+                                        <h3>Outlook</h3>
+                                        <span>AtenCliDistriAnimal@outlook.es</span>
+                                    </div>
+                                </div>
+                            </a>
+                    </div>
+                </div>
+
+            
+    </section>
+
+
+           
+
+    
+
+    <section class="redes_sociales">
+        <div class="intro_redes">
+            <h3>HAZ PARTE DE NUESTRA COMUNIDAD:</h3>
+            <p>
+                Enterate de primera mano de promociones, eventos y noticias que te pueden interesar. Que esperas para
+                seguirnos en nuestras redes sociales y hacer parte de la comunidad que más cuida a sus amigos de cuatro
+                patas.
+            </p>
+        </div>
+        <div class="grupos">
+            <div class="grupo_1">
+                <a href="https://www.facebook.com/VetDistritoAnimal?locale=es_LA" target="_blank">
+                    <div class="faceebok">
+                        <i class="fa-brands fa-facebook-f"></i>
+                        <h3>FACEEBOOk</h3>
+                        <P>Buscanos como: Distrito Animal Vet</P>
+                    </div>
+                </a>
+                <a href="https://x.com/vDistritoAnimal" target="_blank">
+                    <div class="x">
+                        <i class="fa-brands fa-square-x-twitter"></i>
+                        <h3>X</h3>
+                        <p>Buscanos como: Distrito Animal Vet</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="grupo_2">
+                <a href="https://www.instagram.com/vetdistritoanimal/" target="_blank">
+                    <div class="instagram">
+                        <i class="fa-brands fa-square-instagram"></i>
+                        <h3>INSTAGRAM</h3>
+                        <p>Buscanos como: @Vet_Distri_Animal</p>
+                    </div>
+                </a>
+
+                <a href="https://www.tiktok.com/@vet.distritoanimal" target="_blank">
+                    <div class="tiktok">
+                        <i class="fa-brands fa-tiktok"></i>
+                        <h3>TIKTOK</h3>
+                        <p>Buscanos como: @Vet_Distri_Animal</p>
+                    </div>
+                </a>
+
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container-footer">
+            <div class="footer-row">
+                <div class="footer-links">
+                    <h4>Distrito Animal</h4>
+                    <ul>
+                        <a href="/">
+                            <li>Inicio</li>
+                        </a>
+
+                        <a href="/servicio">
+                            <li>Servicios</li>
+                        </a>
+
+                        <a href="/contactanos">
+                            <li>Contactanos</li>
+                        </a>
+
+                        <a href="register">
+                            <li>Registrate</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-links">
+                    <h4>Ayuda</h4>
+                    <ul>
+                        <a href="tel:+6016745375" target="_blank">
+                            <li>Telefono: 3224577898</li>
+                        </a>
+
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=VetDistriAnimal@gmail.com&su=Asunto&body=Mensaje" target="_blank">
+                            <li>email: distrianimal@gmail.com</li>
+                        </a>
+
+                        <a href="https://wa.me/573208478040?text=Hola,%20quiero%20más%20información" target="_blank">
+                            <li>whatsapp:3208478040</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+                <div class="footer-links">
+                    <h4>Siguenos</h4>
+                    <ul>
+                        <a href="https://www.facebook.com/VetDistritoAnimal?locale=es_LA" target="_blank">
+                            <li>Facebook</li>
+                        </a>
+                        <a href="https://www.instagram.com/vetdistritoanimal/" target="_blank">
+                            <li>Instagram</li>
+                        </a>
+                        <a href="https://x.com/vDistritoAnimal" target="_blank">
+                            <li>X</li>
+                        </a>
+                        <a href="https://www.tiktok.com/@vet.distritoanimal" target="_blank">
+                            <li>Tiktok</li>
+                        </a>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </div>
+        <center>
+            <p class="p-footer">© Creado y desarrollado por grupo scrum 5</p>
+        </center>
+
+    </footer>
+
+    <script>
+        const menuToggle = document.getElementById('menu-toggle');
+        const navcontainer = document.getElementById('nav-container');
+
+        menuToggle.addEventListener('click', () => {
+            menuToggle.classList.toggle('active');
+            navcontainer.classList.toggle('active');
+        });
+
+        // Opcional: Cerrar el menú si se hace clic en un enlace
+        const navLinks = document.querySelectorAll('.nav-links a, .inicio_sesion');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                navcontainer.classList.remove('active');
+            });
+        });
+    </script>
+</body>
+
+</body>
+
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carga Masiva - Distrito Animal</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        .upload-card {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background-color: #fff;
+        }
+        .btn-primary {
+            background-color: #2c3e50;
+            border: none;
+        }
+        .btn-primary:hover {
+            background-color: #1a252f;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <div class="container">
+        <div class="upload-card">
+            <h2 class="text-center mb-4">🐾 Carga Masiva de Mascotas</h2>
+            <p class="text-muted text-center">
+                Sube múltiples registros a la vez de forma segura.
+            </p>
+            
+            <hr>
+
+            <form action="{{ url_for('carga.gestionar_carga') }}" method="POST" enctype="multipart/form-data">
+                <div class="mb-4">
+                    <label for="archivo" class="form-label font-weight-bold">Selecciona tu archivo Excel:</label>
+                    <input type="file" name="file" id="archivo" class="form-control" accept=".xlsx, .xls" required>
+                    <small class="text-muted">Asegúrate de que el documento del dueño ya exista en el sistema.</small>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary btn-lg">Procesar e Insertar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalExitoLabel">¡Operación Exitosa!</h5>
+                </div>
+                <div class="modal-body text-center p-4">
+                    <div class="mb-3">
+                        <span style="font-size: 50px;">✅</span>
+                    </div>
+                    <h5>La inserción masiva se completó correctamente.</h5>
+                    <p class="text-muted">Todos los registros del archivo han sido validados y guardados en Distrito Animal.</p>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-success px-5">Regresar al Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Revisamos los mensajes flash enviados por Flask
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        // Si el mensaje contiene "success", disparamos el modal
+                        {% if "success" in message %}
+                            var myModal = new bootstrap.Modal(document.getElementById('modalExito'));
+                            myModal.show();
+                        {% endif %}
+                        
+                        // Si es un error, podrías mostrar una alerta clásica (opcional)
+                        {% if "error" in message %}
+                            alert("{{ message.replace('error:', '') }}");
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        });
+    </script>
+
+</body>
+</html>

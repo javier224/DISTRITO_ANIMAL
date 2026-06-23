@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cita - Distrito Animal</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <style>
+        body {
+            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .form-container {
+            max-width: 650px;
+            margin: 50px auto;
+            background: white;
+            padding: 45px;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            border-top: 10px solid #198754;
+        }
+
+        .form-label {
+            color: #198754;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 1px solid #dee2e6;
+            padding: 22px 15px;
+            transition: all 0.3s;
+            background-color: #fcfdfc;
+        }
+
+        .form-control:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+            background-color: #fff;
+        }
+
+        select.form-control {
+            height: auto !important;
+        }
+
+        .btn-update {
+            background-color: #ffc107;
+            color: #212529;
+            padding: 14px;
+            border-radius: 15px;
+            font-weight: bold;
+            border: none;
+            width: 100%;
+            margin-top: 25px;
+            transition: 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .btn-update:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3);
+        }
+
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            color: #6c757d;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        .btn-cancel:hover {
+            color: #dc3545;
+            text-decoration: none;
+        }
+
+        .section-title {
+            color: #198754;
+            font-weight: 800;
+            margin-bottom: 30px;
+        }
+
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background-color: #e9ecef;
+            color: #495057;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container pt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert"
+            style="border-radius: 15px;">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="text-center">
+                <h2 class="section-title"><i class="fas fa-edit mr-2"></i>Modificar Cita</h2>
+                <p class="text-muted mb-4">Actualiza la información de la cita médica seleccionada.</p>
+                <div class="mb-4">
+                    <span class="status-badge">Estado actual: {{ cita.estado }}</span>
+                </div>
+            </div>
+
+            <form action="{{ url_for('cita_bp.editcita', id=cita.id) }}" method="POST">
+
+                <div class="form-group mb-4">
+                    <label class="form-label"><i class="fas fa-paw mr-2"></i>Paciente (Mascota)</label>
+                    <select name="id_mascota" class="form-control" required>
+                        {% for m in mascotas %}
+                        <option value="{{ m.id }}" {% if m.id==cita.id_mascota %}selected{% endif %}>
+                            {{ m.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label"><i class="fas fa-user-md mr-2"></i>Veterinario asignado</label>
+                    <select name="id_veterinario" class="form-control" required>
+                        {% for v in veterinarios %}
+                        <option value="{{ v.id }}" {% if v.id==cita.id_veterinario %}selected{% endif %}>
+                            Dr. {{ v.nombre_completo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">Inicio</label>
+                        <input type="datetime-local" name="inicio" class="form-control"
+                            value="{{ cita.inicio.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label class="form-label">Fin</label>
+                        <input type="datetime-local" name="fin" class="form-control"
+                            value="{{ cita.fin.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label class="form-label">
+                        <i class="fas fa-notes-medical mr-2"></i>Motivo de la Consulta
+                    </label>
+                    <textarea name="motivo" class="form-control" rows="3"
+                        placeholder="Describe el motivo del cambio o de la cita..."
+                        required>{{ cita.motivo }}</textarea>
+                </div>
+
+                {% if session['id_rol'] == 1 or session['id_rol'] == 2 %}
+                <div class="form-group mb-4">
+                    <label class="form-label"><i class="fas fa-info-circle mr-2"></i>Gestionar Estado</label>
+                    <select name="estado" class="form-control" required>
+                        <option value="PENDIENTE" {% if cita.estado == 'PENDIENTE' %}selected{% endif %}>PENDIENTE</option>
+                        <option value="CONFIRMADA" {% if cita.estado == 'CONFIRMADA' %}selected{% endif %}>CONFIRMADA</option>
+                        <option value="CANCELADA" {% if cita.estado == 'CANCELADA' %}selected{% endif %}>CANCELADA</option>
+                    </select>
+                </div>
+                {% else %}
+                <input type="hidden" name="estado" value="{{ cita.estado }}">
+                {% endif %}
+
+                <button type="submit" class="btn-update shadow">
+                    <i class="fas fa-save mr-2"></i> Guardar Cambios
+                </button>
+
+                <a href="{{ url_for('cita_bp.cita') }}" class="btn-cancel">
+                    <i class="fas fa-times mr-1"></i> Cancelar edición
+                </a>
+            </form>
+        </div>
+    </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputInicio = document.querySelector('input[name="inicio"]');
+            const inputFin = document.querySelector('input[name="fin"]');
+
+            // 1. CONFIGURAR LÍMITES (MÍNIMO Y MÁXIMO)
+            const ahora = new Date();
+            const anio = ahora.getFullYear();
+            const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+            const dia = String(ahora.getDate()).padStart(2, '0');
+            const hora = String(ahora.getHours()).padStart(2, '0');
+            const minutos = String(ahora.getMinutes()).padStart(2, '0');
+            const fechaMinima = `${anio}-${mes}-${dia}T${hora}:${minutos}`;
+
+            const fechaMax = new Date();
+            fechaMax.setMonth(fechaMax.getMonth() + 3); // Límite de 3 meses al futuro
+            
+            const anioMax = fechaMax.getFullYear();
+            const mesMax = String(fechaMax.getMonth() + 1).padStart(2, '0');
+            const diaMax = String(fechaMax.getDate()).padStart(2, '0');
+            const fechaMaximaStr = `${anioMax}-${mesMax}-${diaMax}T23:59`;
+
+            // Aplicamos los límites dinámicos a los inputs
+            inputInicio.min = fechaMinima;
+            inputInicio.max = fechaMaximaStr;
+            inputFin.max = fechaMaximaStr;
+
+            // 2. VALIDACIONES AL CAMBIAR LA FECHA DE INICIO
+            inputInicio.addEventListener('change', function() {
+                if (inputInicio.value) {
+                    // Validar manualmente si se sobrepasó el límite superior por teclado
+                    if (new Date(inputInicio.value) > fechaMax) {
+                        alert("No puedes reprogramar citas con más de 3 meses de anticipación.");
+                        inputInicio.value = "";
+                        inputFin.value = "";
+                        return;
+                    }
+                    // El fin de la cita no puede ser menor al nuevo inicio
+                    inputFin.min = inputInicio.value;
+                }
+            });
+
+            // 3. VALIDACIÓN DE TIEMPO ENTRE INICIO Y FIN
+            inputFin.addEventListener('change', function() {
+                if (inputInicio.value && inputFin.value) {
+                    if (new Date(inputFin.value) <= new Date(inputInicio.value)) {
+                        alert("La fecha de fin debe ser posterior a la fecha de inicio.");
+                        inputFin.value = inputInicio.value; // Resetea para evitar el error
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

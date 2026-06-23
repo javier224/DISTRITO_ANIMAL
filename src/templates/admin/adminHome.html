@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Dashboard Distrito Animal (Admin)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard_admin.css') }}">
+</head>
+
+<body>
+    <input type="checkbox" name="" id="slidebar_toggle">
+    
+    <label for="slidebar_toggle" class="body_label"></label>
+
+    <div class="slidebar">
+        <div class="slidebar_brand">
+            <div class="brand_flex">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" width="30px" alt="Logo">
+                <div>
+                    <span class="las la-bell"></span>
+                    <span class="las la-user-circle"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sliderbar_main">
+            <div class="slidebar_user">
+                <img src="{{ url_for('static', filename='img/DA.IMG.jpg') }}" alt="Distrito Animal Logo">
+                <div>
+                    <h3>DISTRITO ANIMAL</h3>
+                    <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
+                    
+                    <div class="user_actions">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
+                            <span class="las la-user-edit"></span> Editar Perfil Admin
+                        </a>
+                        <a href="{{ url_for('carga.gestionar_carga') }}">
+                            <span class="las la-cloud-upload-alt"></span> Importar Datos
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sliderbar_menu">
+                <div class="menu_head">
+                    <span>Dashboard</span>
+                </div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('veterinario_bp.veterinario') }}">
+                            <span class="las la-syringe"></span> VETERINARIO
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{url_for('mascota_bp.mascota')}}">
+                            <span class="las la-paw"></span> MASCOTA
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('vacuna.home') }}">
+                            <span class="las la-syringe"></span> VACUNA
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{url_for('cita_bp.cita')}}">
+                            <span class="las la-calendar-alt"></span> AGENDAR CITA
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('desparasitante.home') }}">
+                            <span class="las la-capsules"></span> DESPARASITACIÓN
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('servicio.home') }}">
+                            <span class="las la-concierge-bell"></span> SERVICIOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('alimento.home') }}">
+                            <span class="las la-cookie-bite"></span> ALIMENTOS
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('catalogo.home') }}">
+                            <span class="las la-plus-circle"></span> CATÁLOGO
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('factura.lista_factura') }}">
+                            <span class="las la-file-invoice-dollar"></span> FACTURA
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="main_content">
+        <header>
+            <div class="menu_toggle">
+                <label for="slidebar_toggle">
+                    <span class="las la-bars"></span>
+                </label>
+            </div>
+
+            <div class="header_icons">
+                <span class="las la-search"></span>
+                <span class="las la-bookmark"></span>
+                <span class="las la-sms"></span>
+                <form action="{{ url_for('login') }}" method="post" class="d-inline m-0">
+                    <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">
+                         <span class="las la-sign-out-alt" title="Cerrar Sesión"></span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main>
+            <div class="page_header">
+                <div>
+                    <h1>VENTAS DISTRITO ANIMAL</h1>
+                    <small>Bienvenido, <strong>{{ session['rol'] }}</strong></small>
+                    <small class="d-block text-secondary fst-italic">"Ganancias y porcentajes de las distintas categorías..."</small>
+                </div>
+                <form action="{{ url_for('login') }}" method="post" class="m-0">
+                    <button class="btn btn-outline-danger btn-logout-top fw-semibold px-3" type="submit" style="border-radius: 8px;">Cerrar Sesión</button>
+                </form>
+            </div>
+
+            <div class="cards_grid">
+                <div class="card_single">
+                    <div class="card_flex">
+                        <div class="card_info">
+                            <div class="card_head mb-2">
+                                <span>Alimentos</span>
+                                <small class="text-muted d-block">Húmedo - Seco</small>
+                            </div>
+                            <h2>${{ "{:,.0f}".format(ventas_alimentos).replace(',', '.') }}</h2>
+                            <small class="text-secondary fw-medium">Ventas totales históricas</small>
+                        </div>
+                        <div class="d-flex flex-column gap-3 align-items-end">
+                            <a href="{{ url_for('estadisticas.generar_reporte_torta') }}" class="btn-reporte-verde">
+                                <span class="las la-file-pdf"></span> Ver Reporte
+                            </a>
+                            <div class="card_chart success">
+                                <span class="las la-chart-line"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card_single">
+                    <div class="card_flex">
+                        <div class="card_info">
+                            <div class="card_head mb-2">
+                                <span>Control Operativo</span>
+                                <small class="text-muted d-block">Monitoreo General</small>
+                            </div>
+                            <h2>{{ total_vets + total_trabajadores }}</h2>
+                            <small class="text-secondary fw-medium">Miembros del equipo registrados</small>
+                        </div>
+                        <div class="d-flex flex-column justify-content-center">
+                            <div class="card_chart warning">
+                                <span class="las la-users-cog"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="jobs_grid">
+                <div class="job_card">
+                    <div class="jobs_head">
+                        <h1>STAFF</h1>
+                        <span class="las la-ellipsis-h" style="cursor: pointer;"></span>
+                    </div>
+                    <div class="analytics_chart">
+                        <div class="chart_circle">
+                            <h1>{{ porcentaje_staff | int }}%</h1>
+                        </div>
+                        <div class="analytics_note">
+                            <small class="text-muted fw-semibold">Capacidad operativa actual</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="jobs">
+                    <h2>TRABAJADORES <small>Personal registrado en sistema</small></h2>
+                    <div class="table_responsive">
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td style="width: 30px;"><span class="las la-angle-right text-success fw-bold"></span></td>
+                                    <td class="fw-semibold">Veterinarios</td>
+                                    <td class="text-muted">Distrito Animal</td>
+                                    <td>Total de {{ total_vets }}</td>
+                                    <td class="text-end"><button>Ver</button></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="las la-angle-right text-success fw-bold"></span></td>
+                                    <td class="fw-semibold">Total Personal</td>
+                                    <td class="text-muted">Sede Principal</td>
+                                    <td>{{ total_trabajadores }} activos</td>
+                                    <td class="text-end"><button>Ver</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal fade" id="modalPerfil" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header text-white" style="background-color: var(--color-main);">
+                    <h5 class="modal-title fw-bold">🐾 Gestión de Perfil de Administrador</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-4">Desde aquí puedes completar o actualizar tus datos personales de administración central.</p>
+                    
+                    <form action="{{ url_for('guardar_perfil') }}" method="POST" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold small text-secondary">Nombre Completo</label>
+                                <input type="text" name="nombre_completo" class="form-control" 
+                                       value="{{ perfil.nombre_completo if perfil else '' }}" 
+                                       placeholder="Ej: Juan Pérez" 
+                                       required 
+                                       pattern="^[a-zA-ZÀ-ÿ\s]{3,50}$"
+                                       oninput="this.value = this.value.replace(/[0-9]/g, '')" style="border-radius: 8px;">
+                                <div class="invalid-feedback">
+                                    El nombre debe tener entre 3 y 50 caracteres y no puede contener números.
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Tipo de Documento</label>
+                                <select name="tipo_documento" class="form-select" required style="border-radius: 8px;">
+                                    <option value="" disabled {{ 'selected' if not perfil else '' }}>Selecciona...</option>
+                                    <option value="CC" {{ 'selected' if perfil and perfil.tipo_documento == 'CC' else '' }}>Cédula de Ciudadanía</option>
+                                    <option value="TI" {{ 'selected' if perfil and perfil.tipo_documento == 'TI' else '' }}>Tarjeta de Identidad</option>
+                                    <option value="CE" {{ 'selected' if perfil and perfil.tipo_documento == 'CE' else '' }}>Cédula de Extranjería</option>
+                                </select>
+                                <div class="invalid-feedback">Selecciona una opción válida.</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Número de Documento</label>
+                                <input type="text" name="numero_documento" class="form-control" 
+                                       value="{{ perfil.numero_documento if perfil else '' }}" 
+                                       placeholder="123456789" 
+                                       required 
+                                       pattern="[0-9]{7,11}"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="border-radius: 8px;">
+                                <div class="invalid-feedback">Ingresa solo números (entre 7 y 11 dígitos).</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Teléfono de Contacto</label>
+                                <input type="tel" name="telefono" class="form-control" 
+                                       value="{{ perfil.telefono if perfil else '' }}" 
+                                       placeholder="3001234567" 
+                                       required 
+                                       pattern="3[0-9]{9}"
+                                       maxlength="10"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" style="border-radius: 8px;">
+                                <div class="invalid-feedback">Debe ser un número celular de 10 dígitos y empezar por 3.</div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold small text-secondary">Dirección de Residencia</label>
+                                <input type="text" name="direccion_residencial" class="form-control" 
+                                       value="{{ perfil.direccion_residencial if perfil else '' }}" 
+                                       placeholder="Calle 123 # 45-67" 
+                                       required
+                                       pattern="^[a-zA-Z0-9\s#\-\.\,]{5,100}$" style="border-radius: 8px;">
+                                <div class="invalid-feedback">Ingresa una dirección válida (mínimo 5 caracteres).</div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn text-white w-100 py-2 fw-bold shadow-sm" style="background-color: var(--color-accent); border-radius: 8px;">
+                                GUARDAR Y ACTUALIZAR DATOS
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        (() => {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+
+    {% if mostrar_modal %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var myModal = new bootstrap.Modal(document.getElementById('modalPerfil'));
+            myModal.show();
+        });
+    </script>
+    {% endif %}
+</body>
+
+</html>

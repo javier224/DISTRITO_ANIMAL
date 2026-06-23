@@ -1,0 +1,106 @@
+/* Colores utilizados: */
+/* --verde-principal: #008000; (Verde oscuro/tradicional) */
+/* --negro-texto: #1a1a1a; (Negro muy oscuro) */
+/* --blanco-fondo: #ffffff; (Fondo principal) */
+/* --verde-acento: #4CAF50; (Un verde más brillante para interacción) */
+
+body {
+    font-family: 'Verdana', sans-serif;
+    background-color: var(--blanco-fondo); /* Fondo blanco */
+    color: var(--negro-texto); /* Texto oscuro por defecto */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1 {
+    color: var(--verde-principal); /* Título en verde oscuro */
+    border-bottom: 2px solid var(--negro-texto); /* Línea de separación negra */
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+}
+
+p {
+    color: #555555; /* Párrafo en gris oscuro */
+    margin-bottom: 25px;
+}
+
+form {
+    background-color: #f9f9f9; /* Contenedor del formulario ligeramente fuera de blanco */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave y sutil */
+    border: 1px solid #dddddd; /* Borde muy sutil */
+    width: 100%;
+    max-width: 550px;
+    box-sizing: border-box;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 15px;
+    font-weight: bold;
+    color: var(--negro-texto);
+}
+
+input[type="text"],
+input[type="email"],
+select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 4px;
+    background-color: #fff; /* Fondo del input blanco */
+    color: var(--negro-texto);
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+select:focus {
+    border-color: var(--verde-acento); /* Borde verde al enfocar */
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5); /* Sombra sutil verde */
+    outline: none;
+}
+
+/* Estilo para los elementos <br><br> del formulario, para control de espacio */
+form br {
+    display: none; 
+}
+
+button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    margin-top: 30px;
+    background-color: var(--verde-principal); /* Botón en verde oscuro */
+    color: #ffffff; /* Texto del botón en blanco */
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button[type="submit"]:hover {
+    background-color: var(--verde-acento); /* Un verde más brillante al pasar el ratón */
+    transform: translateY(-1px); /* Pequeño efecto 3D */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Variables de color */
+:root {
+    --verde-principal: #008000; 
+    --negro-texto: #1a1a1a;
+    --blanco-fondo: #ffffff;
+    --verde-acento: #4CAF50;
+}
