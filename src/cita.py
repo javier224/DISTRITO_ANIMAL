@@ -7,7 +7,6 @@ from extensiones import mysql, mail
 cita_bp = Blueprint('cita_bp', __name__)
 
 
-#Confirmas cita
 
 @cita_bp.route('/confirmar/<int:id_cita>')
 def confirmar_cita_cliente(id_cita):
