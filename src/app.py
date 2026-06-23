@@ -223,7 +223,6 @@ def reset_password(token, email):
     # Corrección: Pasar token y email al renderizar el formulario por primera vez (GET)
     return render_template('reset_password.html', token=token, email=email)
 
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -262,7 +261,14 @@ def register():
                     <p style="color: #888; font-size: 12px; margin-top: 20px;">Si no creaste esta cuenta, ignora este mensaje.</p>
                 </div>
                 """
-                enviar_correo(email, "Código de activación 🐾", contenido_html)
+                
+                # 🔒 PROTECCIÓN: Envolvemos el envío en un try/except independiente
+                try:
+                    enviar_correo(email, "Código de activación 🐾", contenido_html)
+                except Exception as error_mail:
+                    print(f"🚨 Alerta SMTP: No se pudo despachar el correo: {error_mail}")
+                    flash('El usuario se registró, pero hubo un problema al enviar el correo de activación.', 'warning')
+
                 return render_template('verify.html', email=email)
 
             flash('Registro exitoso de personal. Ya puedes iniciar sesión.', 'success')
