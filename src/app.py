@@ -1,3 +1,4 @@
+import os
 import pymysql
 pymysql.install_as_MySQLdb()
 from flask import Flask, render_template, request, redirect, url_for, flash, session
@@ -5,29 +6,38 @@ import MySQLdb.cursors
 import random
 import string
 
-from extensiones import mysql, bcrypt, mail
-from models import db
+from src.extensiones import mysql, bcrypt, mail
+from src.models import db
 
 app = Flask(__name__)
-app.secret_key = 'distrito_animal_secret_2026'
 
-#  CONFIGURACIÓN DE BASE DE DATOS 
+app.secret_key = os.environ.get('SECRET_KEY', 'distrito_animal_secret_2026')
+
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/distrito_animal'
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '' 
 app.config['MYSQL_PORT'] = 3309
 app.config['MYSQL_DB'] = 'distrito_animal'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost:3306/distrito_animal'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# 3. CONFIGURACIÓN DE CORREO 
 
-#  CONFIGURACIÓN DE CORREO
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'distritoanimal2011@gmail.com'
-app.config['MAIL_PASSWORD'] = 'obry zjtz naln imaf'
-app.config['MAIL_DEFAULT_SENDER'] = ('Distrito Animal', 'distritoanimal2011@gmail.com')
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'distritoanimal2011@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'obry zjtz naln imaf')
+app.config['MAIL_DEFAULT_SENDER'] = ('Distrito Animal', app.config['MAIL_USERNAME'])
 
 
 mysql.init_app(app)
@@ -35,22 +45,23 @@ bcrypt.init_app(app)
 mail.init_app(app)
 db.init_app(app)
 
-#  IMPORTACIÓN DE BLUEPRINTS
-from catalogo import catalogo_bp
-from servicio import servicio_bp
-from vacuna import vacuna_bp
-from desparasitante import desparasitante_bp
-from alimento import alimento_bp
-from factura import factura_bp
-from factura_pdf import factura_pdf_pb
-from veterinario import veterinario_bp
-from mascota import mascota_bp
-from cita import cita_bp
-from factura_estadistico import estadisticas_bp
-from envio_masivo import envio_blueprint
-from carga import carga_bp
+
+from src.catalogo import catalogo_bp
+from src.servicio import servicio_bp
+from src.vacuna import vacuna_bp
+from src.desparasitante import desparasitante_bp
+from src.alimento import alimento_bp
+from src.factura import factura_bp
+from src.factura_pdf import factura_pdf_pb
+from src.veterinario import veterinario_bp
+from src.mascota import mascota_bp
+from src.cita import cita_bp
+from src.factura_estadistico import estadisticas_bp
+from src.envio_masivo import envio_blueprint
+from src.carga import carga_bp
 
 
+# Registro de Blueprints
 app.register_blueprint(catalogo_bp)
 app.register_blueprint(servicio_bp)
 app.register_blueprint(vacuna_bp)
@@ -65,7 +76,7 @@ app.register_blueprint(estadisticas_bp)
 app.register_blueprint(envio_blueprint)
 app.register_blueprint(carga_bp)
 
-# 6. FUNCIONES DE APOYO 
+# 6. FUNCIONES DE APOYO
 
 def generar_codigo():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
