@@ -14,9 +14,14 @@ def home():
     ultimo = cursor.fetchone()[0]
     cursor.close()
 
-    siguiente = ultimo + 1 if ultimo else 1
-    consecutivo_formateado = f"FAC-{siguiente:03d}"
-    return render_template('Factura/index.html', consecutivo = consecutivo_formateado)
+    if ultimo:
+        prefijo, numero_str = ultimo.split('-')
+        nuevo_numero = int(numero_str) + 1
+        siguiente = f"{prefijo}-{str(nuevo_numero).zfill(3)}"
+    else:
+        siguiente = "FAC-001"
+
+    return render_template('Factura/index.html', consecutivo=siguiente)
 
 @factura_bp.route('/agregarFactura', methods=['POST'])
 def agregarFactura():

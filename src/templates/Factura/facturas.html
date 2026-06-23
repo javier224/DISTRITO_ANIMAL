@@ -369,14 +369,14 @@
                                                         class="btn btn-sm btn-custom btn-descargar d-block text-center">
                                                         Descargar PDF 📄
                                                     </a>
-
+                                                     {% if session['id_rol'] in [1, 2] %}
                                                     <button type="button" class="btn btn-sm btn-custom btn-ver"
                                                         data-bs-toggle="modal" data-bs-target="#modalEstadoFactura"
                                                         data-num="{{factura.numero_consecutivo}}"
                                                         data-estado="{{factura.estado_pago}}" data-id={{factura.id}}>
                                                         Cambiar estado
                                                     </button>
-
+                                                     {% endif %}
                                                 </div>
 
                                             </td>
@@ -409,7 +409,6 @@
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content shadow-lg border-0 rounded-3">
-
                 <!-- Encabezado -->
                 <div class="modal-header bg-success text-white">
                     <h5 class="modal-title fw-bold" id="staticBackdropLabel">
