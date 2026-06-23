@@ -13,32 +13,27 @@ from src.models import db
 app = Flask(__name__)
 app.secret_key = 'distrito_animal_secret_2026'
 
-
-# 1. Recuperamos las variables que guardaste en Render para Clever Cloud
 DB_HOST = os.environ.get('DB_HOST')
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_NAME = os.environ.get('DB_NAME')
 
 if DB_HOST and DB_USER and DB_PASSWORD and DB_NAME:
-    # --- CONFIGURACIÓN PARA PRODUCCIÓN (Clever Cloud MySQL) ---
+
     app.config['MYSQL_HOST'] = DB_HOST
     app.config['MYSQL_USER'] = DB_USER
     app.config['MYSQL_PASSWORD'] = DB_PASSWORD
-    app.config['MYSQL_PORT'] = 3306  # El puerto por defecto de Clever Cloud
+    app.config['MYSQL_PORT'] = 3306  
     app.config['MYSQL_DB'] = DB_NAME
     
-    # URI para Flask-SQLAlchemy usando pymysql en producción
     app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:3306/{DB_NAME}"
 else:
-    # --- CONFIGURACIÓN PARA TU ENTORNO LOCAL (Tu PC) ---
     app.config['MYSQL_HOST'] = 'localhost'
     app.config['MYSQL_USER'] = 'root'
     app.config['MYSQL_PASSWORD'] = '' 
-    app.config['MYSQL_PORT'] = 3309  # Tu puerto local habitual
+    app.config['MYSQL_PORT'] = 3309  
     app.config['MYSQL_DB'] = 'distrito_animal'
     
-    # URI para Flask-SQLAlchemy en tu entorno local
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3309/distrito_animal'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
