@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
-from sqlalchemy import text
-from models import db  
+from flask import Blueprint, render_template, request, redirect, url_for
+from extensiones import mysql
+import MySQLdb.cursors
 
 catalogo_bp = Blueprint("catalogo", __name__, url_prefix="/catalogo")
 
@@ -9,96 +9,62 @@ def insertarCatalogo():
     return render_template('Catalogo/crear.html')
 
 def obtener_catalogo():
-    query = text("SELECT * FROM catalogo")
-    result = db.session.execute(query)
-    return [dict(row) for row in result.mappings().all()]
-
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM catalogo")
+    resultado = cursor.fetchall()
+    cursor.close()
+    return resultado
 
 @catalogo_bp.route('/')
 def home():
     info = obtener_catalogo()
     return render_template('Catalogo/index.html', info=info)
 
-
 @catalogo_bp.route('/agregarCatalogo', methods=['POST'])
 def agregarCatalogo():
-    nombre = request.form.get('nombre')
-    precio = request.form.get('precio')
-    stock = request.form.get('stock')
-    opcionCatalogo = request.form.get('opcionCatalogo')
+    nombre = request.form['nombre']
+    precio = request.form['precio']
+    stock = request.form['stock']
+    opcionCatalogo = request.form['opcionCatalogo']
 
     if nombre and precio and stock and opcionCatalogo:
-        try:
-            sql = text("""
-                INSERT INTO catalogo (nombre, precio, tipo_item, stock) 
-                VALUES (:nombre, :precio, :tipo_item, :stock)
-            """)
-            db.session.execute(sql, {
-                "nombre": nombre,
-                "precio": precio,
-                "tipo_item": opcionCatalogo,
-                "stock": stock
-            })
-            db.session.commit()
-            flash('Item agregado al catálogo correctamente.', 'success')
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al agregar catálogo: {e}")
-            flash('Error al guardar en el catálogo.', 'error')
-            
+        cursor = mysql.connection.cursor()
+        sql = 'INSERT INTO catalogo (nombre, precio, tipo_item, stock) VALUES (%s, %s, %s, %s)'
+        info = (nombre, precio, opcionCatalogo, stock)
+        cursor.execute(sql, info)
+        mysql.connection.commit()
+        cursor.close()
     return redirect(url_for('catalogo.home'))
-
 
 @catalogo_bp.route('/eliminarCatalogo/<int:id>')
 def eliminarCatalogo(id):
-    try:
-        sql = text('DELETE FROM catalogo WHERE id = :id')
-        db.session.execute(sql, {"id": id})
-        db.session.commit()
-        flash('Item eliminado correctamente.', 'success')
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error al eliminar catálogo: {e}")
-        flash('No se pudo eliminar el item.', 'error')
-        
+    cursor = mysql.connection.cursor()
+    sql = 'DELETE FROM catalogo WHERE id = %s'
+    cursor.execute(sql, (id,))
+    mysql.connection.commit()
+    cursor.close()
     return redirect(url_for('catalogo.home'))
-
 
 @catalogo_bp.route('/formularioEditar/<int:id>', methods=['GET'])
 def formularioEditar(id):
-    query = text("SELECT * FROM catalogo WHERE id = :id")
-    result = db.session.execute(query, {"id": id}).mappings().first()
-    
-    resultado = dict(result) if result else None
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT * FROM catalogo WHERE id = %s", (id,))
+    resultado = cursor.fetchone()
+    cursor.close()
     return render_template('Catalogo/editar.html', info=resultado)
-
 
 @catalogo_bp.route('/editarCatalogo/<int:id>', methods=['POST'])
 def editarCatalogo(id):
-    nombre = request.form.get('nombre')
-    precio = request.form.get('precio')
-    stock = request.form.get('stock')
-    opcionCatalogo = request.form.get('opcionCatalogo')
+    nombre = request.form['nombre']
+    precio = request.form['precio']
+    stock = request.form['stock']
+    opcionCatalogo = request.form['opcionCatalogo']
 
     if nombre and precio and stock and opcionCatalogo:
-        try:
-            sql = text("""
-                UPDATE catalogo 
-                SET nombre = :nombre, precio = :precio, tipo_item = :tipo_item, stock = :stock 
-                WHERE id = :id
-            """)
-            db.session.execute(sql, {
-                "nombre": nombre,
-                "precio": precio,
-                "tipo_item": opcionCatalogo,
-                "stock": stock,
-                "id": id
-            })
-            db.session.commit()
-            flash('Catálogo actualizado correctamente.', 'success')
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error al editar catálogo: {e}")
-            flash('Error al actualizar el catálogo.', 'error')
-            
+        cursor = mysql.connection.cursor()
+        sql = "UPDATE catalogo SET nombre = %s, precio = %s, tipo_item = %s, stock = %s WHERE id = %s"
+        info = (nombre, precio, opcionCatalogo, stock, id)
+        cursor.execute(sql, info)
+        mysql.connection.commit()
+        cursor.close()
     return redirect(url_for('catalogo.home'))

@@ -1,43 +1,33 @@
-import os
 import pymysql
 pymysql.install_as_MySQLdb()
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import MySQLdb.cursors
 import random
 import string
-from sqlalchemy import text
-from src.extensiones import mysql, bcrypt, mail
-from src.models import db
+
+from extensiones import mysql, bcrypt, mail
+from models import db
 
 app = Flask(__name__)
+app.secret_key = 'distrito_animal_secret_2026'
 
-app.secret_key = os.environ.get('SECRET_KEY', 'distrito_animal_secret_2026')
-
-database_url = os.environ.get('DATABASE_URL')
-
-if database_url:
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-    
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost:3306/distrito_animal'
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#  CONFIGURACIÓN DE BASE DE DATOS 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = '' 
 app.config['MYSQL_PORT'] = 3309
-app.config['MYSQL_DB'] = 'distrito_animal'
+app.config['MYSQL_DB'] = 'FINAL'
 
-# 3. CONFIGURACIÓN DE CORREO 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost:3306/distrito_animal'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+#  CONFIGURACIÓN DE CORREO
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'distritoanimal2011@gmail.com')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'obry zjtz naln imaf')
-app.config['MAIL_DEFAULT_SENDER'] = ('Distrito Animal', app.config['MAIL_USERNAME'])
+app.config['MAIL_USERNAME'] = 'distritoanimal2011@gmail.com'
+app.config['MAIL_PASSWORD'] = 'obry zjtz naln imaf'
+app.config['MAIL_DEFAULT_SENDER'] = ('Distrito Animal', 'distritoanimal2011@gmail.com')
 
 
 mysql.init_app(app)
@@ -45,23 +35,22 @@ bcrypt.init_app(app)
 mail.init_app(app)
 db.init_app(app)
 
+#  IMPORTACIÓN DE BLUEPRINTS
+from catalogo import catalogo_bp
+from servicio import servicio_bp
+from vacuna import vacuna_bp
+from desparasitante import desparasitante_bp
+from alimento import alimento_bp
+from factura import factura_bp
+from factura_pdf import factura_pdf_pb
+from veterinario import veterinario_bp
+from mascota import mascota_bp
+from cita import cita_bp
+from factura_estadistico import estadisticas_bp
+from envio_masivo import envio_blueprint
+from carga import carga_bp
 
-from src.catalogo import catalogo_bp
-from src.servicio import servicio_bp
-from src.vacuna import vacuna_bp
-from src.desparasitante import desparasitante_bp
-from src.alimento import alimento_bp
-from src.factura import factura_bp
-from src.factura_pdf import factura_pdf_pb
-from src.veterinario import veterinario_bp
-from src.mascota import mascota_bp
-from src.cita import cita_bp
-from src.factura_estadistico import estadisticas_bp
-from src.envio_masivo import envio_blueprint
-from src.carga import carga_bp
 
-
-# Registro de Blueprints
 app.register_blueprint(catalogo_bp)
 app.register_blueprint(servicio_bp)
 app.register_blueprint(vacuna_bp)
@@ -76,15 +65,7 @@ app.register_blueprint(estadisticas_bp)
 app.register_blueprint(envio_blueprint)
 app.register_blueprint(carga_bp)
 
-
-with app.app_context():
-    try:
-        db.create_all()
-        print("¡Base de datos PostgreSQL estructurada con éxito!")
-    except Exception as e:
-        print(f"Error al estructurar la base de datos: {e}")
-
-# 6. FUNCIONES DE APOYO
+# 6. FUNCIONES DE APOYO 
 
 def generar_codigo():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
@@ -119,27 +100,18 @@ def contactanos():
 
 # AUTENTICACIÓN 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('correo')
         password_candidate = request.form.get('contra')
         
-        query = text("""
-            SELECT u.*, r.nombre AS rol_nombre 
-            FROM usuario u 
-            JOIN rol r ON u.fk_rol = r.id 
-            WHERE u.correo = :email
-        """)
-        
-        result = db.session.execute(query, {"email": email})
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        query = "SELECT u.*, r.nombre AS rol_nombre FROM usuario u JOIN rol r ON u.fk_rol = r.id WHERE u.correo = %s"
+        cursor.execute(query, (email,))
+        user = cursor.fetchone()
 
-        user_row = result.mappings().first()
-
-        if user_row:
-            user = dict(user_row)
-            
+        if user:
             if not user['esta_verificado']:
                 flash('Por favor, verifica tu cuenta primero.', 'warning')
                 return render_template('login.html')
@@ -160,7 +132,6 @@ def login():
                 flash('Contraseña incorrecta.', 'error')
         else:
             flash('Usuario no encontrado.', 'error')
-            
     return render_template('login.html')
 
 @app.route('/forgot_password', methods=['GET', 'POST'])
@@ -169,20 +140,15 @@ def forgot_password():
         email = request.form.get('email')
         token = generar_codigo()
         
-        query_select = text("SELECT * FROM usuario WHERE correo = :email")
-        result = db.session.execute(query_select, {"email": email})
-        user_row = result.mappings().first()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM USUARIO WHERE correo = %s", (email,))
+        user = cursor.fetchone()
         
-        if user_row:
-            query_update = text("""
-                UPDATE usuario 
-                SET token_verificacion = :token 
-                WHERE correo = :email
-            """)
-            db.session.execute(query_update, {"token": token, "email": email})
+        if user:
+            cursor.execute("UPDATE USUARIO SET token_verificacion = %s WHERE correo = %s", (token, email))
+            mysql.connection.commit()
             
-            db.session.commit()
-            
+            # Generar link absoluto para el correo
             link = url_for('reset_password', token=token, email=email, _external=True)
             
             contenido = f"""
@@ -207,36 +173,29 @@ def reset_password(token, email):
         nueva_contra = request.form.get('nueva_contra')
         confirm_contra = request.form.get('confirm_contra')
         
+        # Corrección: Pasar token y email de vuelta al template si hay error
         if nueva_contra != confirm_contra:
             flash('Las contraseñas no coinciden.', 'error')
             return render_template('reset_password.html', token=token, email=email)
         
         hashed_pw = bcrypt.generate_password_hash(nueva_contra).decode('utf-8')
         
-        query_select = text("""
-            SELECT * FROM usuario 
-            WHERE correo = :email AND token_verificacion = :token
-        """)
-        result = db.session.execute(query_select, {"email": email, "token": token})
-        user = result.mappings().first()
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM USUARIO WHERE correo = %s AND token_verificacion = %s", (email, token))
         
-        if user:
-            query_update = text("""
-                UPDATE usuario 
-                SET contra = :contra, token_verificacion = NULL 
-                WHERE correo = :email
-            """)
-            db.session.execute(query_update, {"contra": hashed_pw, "email": email})
-            
-            db.session.commit()
-            
+        if cursor.fetchone():
+            # Actualizar y limpiar el token para que sea de un solo uso
+            cursor.execute("UPDATE USUARIO SET contra = %s, token_verificacion = NULL WHERE correo = %s", (hashed_pw, email))
+            mysql.connection.commit()
             flash('Tu contraseña ha sido actualizada. Ya puedes iniciar sesión.', 'success')
             return redirect(url_for('login'))
         else:
             flash('El enlace ha expirado o es inválido.', 'error')
             return redirect(url_for('login'))
             
+    # Corrección: Pasar token y email al renderizar el formulario por primera vez (GET)
     return render_template('reset_password.html', token=token, email=email)
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -257,20 +216,11 @@ def register():
         token = None if es_personal else generar_codigo()
 
         try:
-            query = text("""
-                INSERT INTO usuario (correo, contra, token_verificacion, esta_verificado, fk_rol) 
-                VALUES (:correo, :contra, :token, :esta_verificado, :fk_rol)
-            """)
-            
-            db.session.execute(query, {
-                "correo": email,
-                "contra": hashed_pw,
-                "token": token,
-                "esta_verificado": esta_verificado,
-                "fk_rol": id_rol
-            })
-            
-            db.session.commit()
+            cursor = mysql.connection.cursor()
+            query = """INSERT INTO usuario (correo, contra, token_verificacion, esta_verificado, fk_rol) 
+                       VALUES (%s, %s, %s, %s, %s)"""
+            cursor.execute(query, (email, hashed_pw, token, esta_verificado, id_rol))
+            mysql.connection.commit()
             
             if not es_personal:
                 contenido_html = f"""
@@ -292,7 +242,6 @@ def register():
             return redirect(url_for('login'))
 
         except Exception as e:
-            db.session.rollback()
             print(f"Error en registro: {e}")
             flash('El correo ya existe o hubo un problema con la base de datos.', 'error')
             
@@ -304,25 +253,22 @@ def verify():
         email = request.form.get('email')
         token_ing = request.form.get('codigo')
         
-        query_select = text("SELECT * FROM usuario WHERE correo = :email AND token_verificacion = :token")
-        result = db.session.execute(query_select, {"email": email, "token": token_ing})
-        if result.mappings().first():
-            query_update = text("UPDATE usuario SET esta_verificado = 1, token_verificacion = NULL WHERE correo = :email")
-            db.session.execute(query_update, {"email": email})
-            db.session.commit()
-            
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM usuario WHERE correo = %s AND token_verificacion = %s", (email, token_ing))
+        if cursor.fetchone():
+            cursor.execute("UPDATE usuario SET esta_verificado = 1, token_verificacion = NULL WHERE correo = %s", (email,))
+            mysql.connection.commit()
             flash('Cuenta activada.', 'success')
             return redirect(url_for('login'))
-        
         flash('Código inválido.', 'error')
     return render_template('verify.html')
 
 
 @app.route('/guardar_perfil', methods=['POST'])
 def guardar_perfil():
-    if not session.get('loggedin'): 
-        return redirect(url_for('login'))
+    if not session.get('loggedin'): return redirect(url_for('login'))
     
+    # Extraemos los datos del formulario
     nombre = request.form.get('nombre_completo')
     tel = request.form.get('telefono')
     tipo_doc = request.form.get('tipo_documento')
@@ -334,44 +280,28 @@ def guardar_perfil():
         return redirect(url_for('login'))
 
     try:
-        is_postgres = "postgresql" in app.config['SQLALCHEMY_DATABASE_URI']
-
-        if is_postgres:
-            query = text("""
-                INSERT INTO perfil 
-                (nombre_completo, telefono, tipo_documento, numero_documento, direccion_residencial, fk_usuario) 
-                VALUES (:nombre, :tel, :tipo_doc, :num_doc, :direccion, :id_usu)
-                ON CONFLICT (fk_usuario) DO UPDATE SET 
-                nombre_completo = EXCLUDED.nombre_completo,
-                telefono = EXCLUDED.telefono,
-                tipo_documento = EXCLUDED.tipo_documento,
-                numero_documento = EXCLUDED.numero_documento,
-                direccion_residencial = EXCLUDED.direccion_residencial
-            """)
-        else:
-            query = text("""
-                INSERT INTO perfil 
-                (nombre_completo, telefono, tipo_documento, numero_documento, direccion_residencial, fk_usuario) 
-                VALUES (:nombre, :tel, :tipo_doc, :num_doc, :direccion, :id_usu)
-                ON DUPLICATE KEY UPDATE 
-                nombre_completo = VALUES(nombre_completo),
-                telefono = VALUES(telefono),
-                tipo_documento = VALUES(tipo_documento),
-                numero_documento = VALUES(numero_documento),
-                direccion_residencial = VALUES(direccion_residencial)
-            """)
+        cursor = mysql.connection.cursor()
         
-        db.session.execute(query, {
-            "nombre": nombre, "tel": tel, "tipo_doc": tipo_doc, 
-            "num_doc": num_doc, "direccion": direccion, "id_usu": id_usu
-        })
-        db.session.commit()
+        query = """
+            INSERT INTO perfil 
+            (nombre_completo, telefono, tipo_documento, numero_documento, direccion_residencial, fk_usuario) 
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE 
+            nombre_completo = VALUES(nombre_completo),
+            telefono = VALUES(telefono),
+            tipo_documento = VALUES(tipo_documento),
+            numero_documento = VALUES(numero_documento),
+            direccion_residencial = VALUES(direccion_residencial)
+        """
+        
+        cursor.execute(query, (nombre, tel, tipo_doc, num_doc, direccion, id_usu))
+        mysql.connection.commit()
+        cursor.close()
         
     except Exception as e:
-        db.session.rollback()
+        mysql.connection.rollback()
         print(f"ERROR EN PERFIL: {e}")
-        flash('Hubo un problema al guardar el perfil.', 'error')
-
+    
     # Redirección según el rol
     rol = session.get('rol')
     if rol == 'Administrador': return redirect(url_for('admin_dashboard'))
@@ -382,36 +312,36 @@ def guardar_perfil():
 
 @app.route('/admin/dashboard')
 def admin_dashboard():
-    if not session.get('loggedin'): 
-        return redirect(url_for('login'))
+    if not session.get('loggedin'): return redirect(url_for('login'))
     
     id_usu = session.get('id_usuario')
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     
-    query_perfil = text("SELECT * FROM perfil WHERE fk_usuario = :id_usu")
-    perfil_row = db.session.execute(query_perfil, {"id_usu": id_usu}).mappings().first()
-    perfil_existente = dict(perfil_row) if perfil_row else None
+    cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usu,))
+    perfil_existente = cursor.fetchone()
     
     mostrar_modal = True if not perfil_existente else False
 
-    query_alimentos = text("""
+    query_alimentos = """
         SELECT SUM(df.subtotal) as total 
         FROM detalle_factura df
         JOIN catalogo c ON df.fk_catalogo = c.id
         WHERE c.tipo_item = 'ALIMENTO'
-    """)
-    res_ventas = db.session.execute(query_alimentos).mappings().first()
-    ventas_alimentos = res_ventas['total'] if res_ventas and res_ventas['total'] else 0
+    """
+    cursor.execute(query_alimentos)
+    resultado_ventas = cursor.fetchone()
+    ventas_alimentos = resultado_ventas['total'] if resultado_ventas['total'] else 0
 
-    query_vets = text("SELECT COUNT(*) as total FROM veterinario")
-    res_vets = db.session.execute(query_vets).mappings().first()
-    total_vets = res_vets['total'] if res_vets else 0
+    cursor.execute("SELECT COUNT(*) as total FROM veterinario")
+    total_vets = cursor.fetchone()['total']
 
-    query_trabajadores = text("SELECT COUNT(*) as total FROM usuario WHERE fk_rol IN (1, 2)")
-    res_trabajadores = db.session.execute(query_trabajadores, {"roles": (1, 2)}).mappings().first()
-    total_trabajadores = res_trabajadores['total'] if res_trabajadores else 0
+    cursor.execute("SELECT COUNT(*) as total FROM usuario WHERE fk_rol IN (1, 2)")
+    total_trabajadores = cursor.fetchone()['total']
 
     meta_staff = 8
-    porcentaje_staff = (total_trabajadores / meta_staff) * 100 if meta_staff > 0 else 0
+    porcentaje_staff = (total_trabajadores / meta_staff) * 100
+
+    cursor.close()
     
     return render_template('admin/adminHome.html', 
                            perfil=perfil_existente, 
@@ -421,43 +351,31 @@ def admin_dashboard():
                            total_trabajadores=total_trabajadores,
                            porcentaje_staff=porcentaje_staff)
     
-
 @app.route('/vet/dashboard')
 def vet_dashboard():
     if session.get('loggedin') and session.get('rol') == 'Veterinario':
         id_usu = session.get('id_usuario')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        query_perfil = text("SELECT * FROM perfil WHERE fk_usuario = :id_usu")
-        perfil_row = db.session.execute(query_perfil, {"id_usu": id_usu}).mappings().first()
-        perfil_data = dict(perfil_row) if perfil_row else None
+        #  Lógica de Perfil 
+        cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usu,))
+        perfil_data = cursor.fetchone()
         
-        query_vet_reg = text("""
-            SELECT id FROM veterinario 
-            WHERE id_perfil = (SELECT id_perfil FROM perfil WHERE fk_usuario = :id_usu)
-        """)
-        vet_row = db.session.execute(query_vet_reg, {"id_usu": id_usu}).mappings().first()
+        cursor.execute("SELECT id FROM veterinario WHERE id_perfil = (SELECT id_perfil FROM perfil WHERE fk_usuario = %s)", (id_usu,))
+        vet_reg = cursor.fetchone()
         
         citas_hoy = 0
         total_pacientes = 0
         
-        if vet_row:
-            id_vet = vet_row['id']
+        if vet_reg:
+            id_vet = vet_reg['id']
+            cursor.execute("SELECT COUNT(*) as total FROM cita WHERE id_veterinario = %s AND DATE(inicio) = CURDATE()", (id_vet,))
+            citas_hoy = cursor.fetchone()['total']
             
-            query_citas = text("""
-                SELECT COUNT(*) as total 
-                FROM cita 
-                WHERE id_veterinario = :id_vet AND DATE(inicio) = CURRENT_DATE
-            """)
-            res_citas = db.session.execute(query_citas, {"id_vet": id_vet}).mappings().first()
-            citas_hoy = res_citas['total'] if res_citas else 0
-            
-            query_pacientes = text("""
-                SELECT COUNT(DISTINCT id_mascota) as total 
-                FROM cita 
-                WHERE id_veterinario = :id_vet
-            """)
-            res_pacientes = db.session.execute(query_pacientes, {"id_vet": id_vet}).mappings().first()
-            total_pacientes = res_pacientes['total'] if res_pacientes else 0
+            cursor.execute("SELECT COUNT(DISTINCT id_mascota) as total FROM cita WHERE id_veterinario = %s", (id_vet,))
+            total_pacientes = cursor.fetchone()['total']
+
+        cursor.close()
         
         return render_template('vet/vetHome.html', 
                                perfil=perfil_data, 
@@ -471,10 +389,11 @@ def vet_dashboard():
 def cliente_dashboard():
     if session.get('loggedin') and session.get('rol') == 'Cliente':
         id_usu = session.get('id_usuario')
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        query_perfil = text("SELECT * FROM perfil WHERE fk_usuario = :id_usu")
-        perfil_row = db.session.execute(query_perfil, {"id_usu": id_usu}).mappings().first()
-        perfil_data = dict(perfil_row) if perfil_row else None
+        # Lógica de Perfil
+        cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usu,))
+        perfil_data = cursor.fetchone()
         
         mis_mascotas = 0
         proximas_citas = 0
@@ -482,17 +401,17 @@ def cliente_dashboard():
         if perfil_data:
             id_perfil = perfil_data['id_perfil']
             
-            query_mascotas = text("SELECT COUNT(*) as total FROM mascota WHERE id_dueno = :id_dueno")
-            res_mascotas = db.session.execute(query_mascotas, {"id_dueno": id_perfil}).mappings().first()
-            mis_mascotas = res_mascotas['total'] if res_mascotas else 0
+            cursor.execute("SELECT COUNT(*) as total FROM mascota WHERE id_dueno = %s", (id_perfil,))
+            mis_mascotas = cursor.fetchone()['total']
             
-            query_citas = text("""
+            cursor.execute("""
                 SELECT COUNT(*) as total FROM cita c
                 JOIN mascota m ON c.id_mascota = m.id
-                WHERE m.id_dueno = :id_dueno AND c.inicio >= CURRENT_TIMESTAMP
-            """)
-            res_citas = db.session.execute(query_citas, {"id_dueno": id_perfil}).mappings().first()
-            proximas_citas = res_citas['total'] if res_citas else 0
+                WHERE m.id_dueno = %s AND c.inicio >= NOW()
+            """, (id_perfil,))
+            proximas_citas = cursor.fetchone()['total']
+
+        cursor.close()
         
         return render_template('cliente/clienteHome.html', 
                                perfil=perfil_data, 

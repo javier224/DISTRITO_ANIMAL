@@ -14,31 +14,26 @@ def gestionar_carga():
 
         try:
             df = pd.read_excel(archivo)
-            
-            df.dropna(how='all', inplace=True)
-            
             for _, fila in df.iterrows():
-                doc_dueno = str(fila['documento_dueno']).strip().split('.')[0]
-                
-                dueno = Perfil.query.filter_by(numero_documento=doc_dueno).first()
+                dueno = Perfil.query.filter_by(numero_documento=str(fila['documento_dueno'])).first()
                 if dueno:
                     nueva_mascota = Mascota(
-                        nombre=str(fila['nombre']).strip(),
-                        especie=str(fila['especie']).strip(),
-                        raza=str(fila['raza']).strip(),
-                        genero=str(fila['genero']).strip(),
+                        nombre=fila['nombre'],
+                        especie=fila['especie'],
+                        raza=fila['raza'],
+                        genero=fila['genero'],
                         id_dueno=dueno.id_perfil
                     )
                     db.session.add(nueva_mascota)
             
             db.session.commit()
+            # Enviamos un mensaje específico para activar el modal
             flash("success:¡Inserción masiva completada con éxito!")
-            
         except Exception as e:
             db.session.rollback()
-            print(f"ERROR EN CARGA MASIVA: {e}")
             flash(f"error:Hubo un problema al procesar el Excel: {str(e)}")
         
         return redirect(url_for('carga.gestionar_carga'))
 
+    # Si es GET, simplemente muestra la página
     return render_template('carga/carga.html')
