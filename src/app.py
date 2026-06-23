@@ -76,6 +76,16 @@ app.register_blueprint(estadisticas_bp)
 app.register_blueprint(envio_blueprint)
 app.register_blueprint(carga_bp)
 
+# =========================================================================
+# CREACIÓN AUTOMÁTICA DE TABLAS EN PRODUCCIÓN
+# =========================================================================
+with app.app_context():
+    try:
+        db.create_all()
+        print("¡Base de datos PostgreSQL estructurada con éxito!")
+    except Exception as e:
+        print(f"Error al estructurar la base de datos: {e}")
+
 # 6. FUNCIONES DE APOYO
 
 def generar_codigo():
