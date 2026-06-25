@@ -1,13 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, session, url_for, flash, jsonify
 import MySQLdb.cursors
 from datetime import datetime, timedelta
-from flask_mail import Message
-from extensiones import mysql, mail
+import os
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+from extensiones import mysql
 
 cita_bp = Blueprint('cita_bp', __name__)
 
-
-
+# ==========================================
+# 1. RUTA PARA CONFIRMAR LA CITA (CLIENTE)
+# ==========================================
 @cita_bp.route('/confirmar/<int:id_cita>')
 def confirmar_cita_cliente(id_cita):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -41,9 +44,9 @@ def confirmar_cita_cliente(id_cita):
     return "<h1>Error: Cita no encontrada</h1>", 404
 
 
-
-#Vista general cita
-
+# ==========================================
+# 2. VISTA GENERAL DE CITAS
+# ==========================================
 @cita_bp.route('/Cita')
 def cita():
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
@@ -62,9 +65,9 @@ def cita():
     return render_template('Cita/cita.html', data=myresult)
 
 
-
-#Metodo agregar cita
-
+# ==========================================
+# 3. MÉTODO AGREGAR CITA Y ENVIAR SENDGRID
+# ==========================================
 @cita_bp.route('/agregarCita', methods=['POST'])
 def addCita():
     id_mascota = request.form.get('id_mascota')
@@ -79,7 +82,7 @@ def addCita():
     fecha_inicio = datetime.strptime(inicio_str, '%Y-%m-%dT%H:%M')
     fecha_fin = datetime.strptime(fin_str, '%Y-%m-%dT%H:%M')
     
-    # Validaciones
+    # Validaciones de horario corporativo
     if fecha_inicio < ahora:
         flash("No puedes agendar citas en fechas pasadas.", "danger")
         return redirect(url_for('cita_bp.formulario_cita')) 
@@ -90,6 +93,7 @@ def addCita():
 
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
+    # Validación de cruce de horarios para el veterinario elegido
     sql_cruce = "SELECT id FROM cita WHERE id_veterinario = %s AND (%s < fin AND %s > inicio)"
     cursor.execute(sql_cruce, (id_veterinario, inicio_str, fin_str))
     if cursor.fetchone():
@@ -97,27 +101,56 @@ def addCita():
         flash("El veterinario ya tiene una cita en ese horario.", "danger")
         return redirect(url_for('cita_bp.formulario_cita'))
 
+    # Guardado de la cita en la base de datos
     sql_insert = "INSERT INTO cita (inicio, fin, motivo, estado, id_mascota, id_veterinario) VALUES (%s, %s, %s, %s, %s, %s)"
     cursor.execute(sql_insert, (inicio_str, fin_str, motivo, estado, id_mascota, id_veterinario))
     mysql.connection.commit()
     
+    # Envío transaccional del correo de confirmación
     try:
         id_nueva_cita = cursor.lastrowid 
-        msg = Message("Confirma tu cita en Distrito Animal 🐾", recipients=[correo_cliente])
-        msg.html = f"""
-            <h2>Cita agendada para el {inicio_str}</h2>
-            <p>Haz clic para confirmar: 
-            <a href='http://127.0.0.1:5000/confirmar/{id_nueva_cita}'>Confirmar Asistencia</a></p>
-        """
-        mail.send(msg)
-        flash("Cita registrada y correo enviado.", "success")
+        api_key = os.environ.get('SENDGRID_API_KEY')
+        
+        if not api_key:
+            flash("Cita guardada, pero el servidor no tiene configurada la llave de SendGrid.", "warning")
+        else:
+            # Enlace apuntando al dominio de producción en Render
+            enlace_confirmacion = f"https://distrito-animal.onrender.com/confirmar/{id_nueva_cita}"
+            fecha_correo = fecha_inicio.strftime('%d/%m/%Y a las %I:%M %p')
+
+            contenido_html = f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+                <h2 style="color: #006400; text-align: center;">¡Tu cita ha sido agendada! 🐾</h2>
+                <p>Gracias por confiar en <strong>Distrito Animal</strong>. Hemos registrado tu solicitud médica para el día <strong>{fecha_correo}</strong>.</p>
+                <p>Para confirmar tu asistencia y asegurar el espacio con el especialista, por favor presiona el siguiente botón:</p>
+                
+                <p style="text-align: center; margin: 30px 0;">
+                    <a href="{enlace_confirmacion}" style="background-color: #006400; color: white; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 5px; display: inline-block;">
+                        Confirmar Asistencia
+                    </a>
+                </p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+                <p style="font-size: 0.85em; color: #777; text-align: center;">Si no solicitaste este servicio, puedes ignorar este mensaje.</p>
+            </div>
+            """
+
+            message = Mail(
+                from_email='distritoanimal2011@gmail.com', # Cuenta verificada Single Sender
+                to_emails=correo_cliente,
+                subject="Confirma tu cita en Distrito Animal 🐾",
+                html_content=contenido_html
+            )
+
+            sg = SendGridAPIClient(api_key)
+            sg.send(message)
+            flash("Cita registrada y correo de confirmación enviado exitosamente.", "success")
+
     except Exception as e:
-        flash(f"Cita guardada, error al enviar correo: {str(e)}", "warning")
+        print(f"❌ Error al despachar correo individual SendGrid: {e}")
+        flash(f"Cita guardada en el sistema, pero ocurrió un problema al notificar por correo: {str(e)}", "warning")
 
     cursor.close()
     return redirect(url_for('cita_bp.cita'))
-
-
 
 #Metodo eliminar cita
 

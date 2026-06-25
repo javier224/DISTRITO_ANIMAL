@@ -20,6 +20,100 @@
             border: 1.5px solid #ff4d4d !important;
             border-radius: 8px;
         }
+
+        /* Enlace para alternar formularios exclusivo para móviles */
+        .mobile-toggle {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        .mobile-toggle a {
+            color: #006400;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* =======================================================
+           MEDIA QUERY: DISEÑO RESPONSIVO PARA TELÉFONOS (MÓVILES)
+           ======================================================= */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                height: auto;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .header_action {
+                position: static;
+                margin-bottom: 15px;
+                width: 100%;
+                max-width: 400px;
+            }
+
+            .header_action .regresar {
+                width: 100%;
+                padding: 12px;
+            }
+
+            /* Forzamos al contenedor a ser una sola columna adaptable */
+            .container {
+                width: 100% !important;
+                max-width: 400px;
+                height: auto !important;
+                min-height: 480px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                border-radius: 12px;
+                overflow: hidden;
+                position: relative;
+                padding: 20px;
+                display: block !important;
+            }
+
+            /* Ocultamos por completo el panel lateral deslizante en móviles */
+            .toggle_box {
+                display: none !important;
+            }
+
+            /* Estilizamos las cajas de los formularios para que ocupen todo el espacio móvil */
+            .form_box {
+                position: relative !important;
+                width: 100% !important;
+                height: auto !important;
+                left: 0 !important;
+                padding: 10px 5px !important;
+                transition: none !important; /* Desactivamos animaciones pesadas en móvil */
+            }
+
+            /* Por defecto ocultamos el formulario de registro al cargar */
+            .form_box.register {
+                display: none;
+            }
+
+            /* Mostramos los enlaces de intercambio en móviles */
+            .mobile-toggle {
+                display: block;
+            }
+
+            h1 {
+                font-size: 1.8rem !important;
+                margin-bottom: 20px !important;
+            }
+
+            .input_box {
+                margin: 15px 0 !important;
+            }
+
+            .btn {
+                width: 100% !important;
+                padding: 12px !important;
+                margin-top: 15px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -50,7 +144,7 @@
             {% endwith %}
         </div>
 
-        <div class="form_box login">
+        <div class="form_box login" id="loginBox">
             <form action="{{ url_for('login') }}" method="post" id="loginForm" novalidate>
                 <h1>INICIAR SESIÓN</h1>
                 
@@ -68,10 +162,14 @@
                 </div>
                 
                 <button type="submit" class="btn">Iniciar sesión</button>
+
+                <div class="mobile-toggle">
+                    <p>¿No tienes cuenta? <a href="#" id="goToRegister">Regístrate aquí</a></p>
+                </div>
             </form>
         </div>
 
-        <div class="form_box register">
+        <div class="form_box register" id="registerBox">
             <form action="{{ url_for('register') }}" method="post" id="registerForm" novalidate>
                 <h1>REGISTRARSE</h1>
                 <p style="font-size: 0.8rem; margin-bottom: 15px; color: #666;">Crea tu cuenta de acceso rápido.</p>
@@ -92,6 +190,10 @@
                 </div>
 
                 <button type="submit" class="btn">Registrarme</button>
+
+                <div class="mobile-toggle">
+                    <p>¿Ya tienes cuenta? <a href="#" id="goToLogin">Inicia sesión</a></p>
+                </div>
             </form>
         </div>
 
@@ -116,11 +218,31 @@
         document.addEventListener("DOMContentLoaded", () => {
             const loginForm = document.getElementById('loginForm');
             const registerForm = document.getElementById('registerForm');
+            
+            // Elementos para el intercambio en vista móvil
+            const loginBox = document.getElementById('loginBox');
+            const registerBox = document.getElementById('registerBox');
+            const goToRegister = document.getElementById('goToRegister');
+            const goToLogin = document.getElementById('goToLogin');
+
+            // Alternancia táctil exclusiva para celulares
+            if(goToRegister && goToLogin) {
+                goToRegister.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loginBox.style.display = 'none';
+                    registerBox.style.display = 'block';
+                });
+
+                goToLogin.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    registerBox.style.display = 'none';
+                    loginBox.style.display = 'block';
+                });
+            }
 
             // Configuración de Regex Robustas
             const REGEX = {
                 email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                // 8+ caracteres, 1 Mayús, 1 Minús, 1 Núm, 1 Especial
                 password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
             };
 
@@ -163,7 +285,7 @@
                 });
             }
 
-            // --- VALIDACIÓN REGISTRO ---
+            
             if (registerForm) {
                 registerForm.addEventListener('submit', (e) => {
                     clearErrors(registerForm);
