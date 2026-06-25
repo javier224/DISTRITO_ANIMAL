@@ -386,7 +386,7 @@ def vet_dashboard():
         id_usu = session.get('id_usuario')
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        #  Lógica de Perfil 
+        # Lógica de Perfil 
         cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usu,))
         perfil_data = cursor.fetchone()
         
@@ -406,9 +406,15 @@ def vet_dashboard():
 
         cursor.close()
         
+        if perfil_data is None:
+            perfil_data = {}
+            forzar_modal = True
+        else:
+            forzar_modal = False
+        
         return render_template('vet/vetHome.html', 
                                perfil=perfil_data, 
-                               mostrar_modal= perfil_data,
+                               mostrar_modal=forzar_modal, 
                                citas_hoy=citas_hoy,
                                total_pacientes=total_pacientes)
     
