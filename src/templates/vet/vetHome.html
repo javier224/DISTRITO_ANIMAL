@@ -36,16 +36,15 @@
                     <span>{{ session['email'] if session.get('email') else 'usuario@ejemplo.com' }}</span>
                 </div>
             </div>
-
+                      <div class="user_actions">
+                        <a href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
+                            <span class="las la-user-edit"></span> Editar Perfil Veterinario
+                        </a>
             <div class="sliderbar_menu">
                 <div class="menu_head">
                     <span>Dashboard</span>
                 </div>
                 <ul>
-                     <div class="user_actions">
-                        <a href="#" data-bs-toggle="modal" data-bs-target="#modalPerfil">
-                            <span class="las la-user-edit"></span> Editar Perfil Admin
-                        </a>
                     <li>
                         <a href="{{url_for('vet_dashboard')}}">
                             <span class="las la-chart-pie"></span> ANÁLISIS
