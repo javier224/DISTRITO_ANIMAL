@@ -14,9 +14,16 @@ def home():
     ultimo = cursor.fetchone()[0]
     cursor.close()
 
+
     if ultimo:
-        prefijo, numero_str = ultimo.split('-')
-        nuevo_numero = int(numero_str) + 1
+        prefijo, numero_str = ultimo.split('-', 1)
+        solo_numeros = ''.join(filter(str.isdigit, numero_str))
+        
+        if solo_numeros:
+            nuevo_numero = int(solo_numeros) + 1
+        else:
+            nuevo_numero = 1
+            
         siguiente = f"{prefijo}-{str(nuevo_numero).zfill(3)}"
     else:
         siguiente = "FAC-001"
@@ -59,11 +66,8 @@ def agregarFactura():
         tipo_item = cursor.fetchone()[0]
 
         if tipo_item != 'SERVICIO':
-             #Acá descontamos el stock normalmente a los demás items
             valores_update = (item['cantidad'], item['id_producto'], item['cantidad'])
             cursor.execute(sql_update_stock, valores_update)
-
-            #Se verifica si el descuento se realizó correctamente
 
         if cursor.rowcount == 0:
             mysql.connection.rollback()
@@ -73,7 +77,6 @@ def agregarFactura():
 
             }), 400
 
-                # Confirmamos la transacción completa
         mysql.connection.commit()
         
         return jsonify({"status": "success", "message": "¡Factura agregada satisfactoriamente!"}), 201
