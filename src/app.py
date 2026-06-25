@@ -379,39 +379,50 @@ def admin_dashboard():
                            total_vets=total_vets,
                            total_trabajadores=total_trabajadores,
                            porcentaje_staff=porcentaje_staff)
-    
 @app.route('/vet/dashboard')
 def vet_dashboard():
     if session.get('loggedin') and session.get('rol') == 'Veterinario':
         id_usu = session.get('id_usuario')
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         
-        # Lógica de Perfil 
+        # 1. Traer el perfil primero de forma limpia
         cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usu,))
         perfil_data = cursor.fetchone()
         
-        cursor.execute("SELECT id FROM veterinario WHERE id_perfil = (SELECT id_perfil FROM perfil WHERE fk_usuario = %s)", (id_usu,))
-        vet_reg = cursor.fetchone()
-        
         citas_hoy = 0
         total_pacientes = 0
+        vet_reg = None
         
-        if vet_reg:
-            id_vet = vet_reg['id']
-            cursor.execute("SELECT COUNT(*) as total FROM cita WHERE id_veterinario = %s AND DATE(inicio) = CURDATE()", (id_vet,))
-            citas_hoy = cursor.fetchone()['total']
+        # 2. Solo buscar en la tabla 'veterinario' si el perfil REALMENTE existe
+        if perfil_data:
+            id_perfil_actual = perfil_data['id_perfil']
+            cursor.execute("SELECT id FROM veterinario WHERE id_perfil = %s", (id_perfil_actual,))
+            vet_reg = cursor.fetchone()
             
-            cursor.execute("SELECT COUNT(DISTINCT id_mascota) as total FROM cita WHERE id_veterinario = %s", (id_vet,))
-            total_pacientes = cursor.fetchone()['total']
-
+            # Si tiene registro de veterinario, calculamos sus estadísticas
+            if vet_reg:
+                id_vet = vet_reg['id']
+                cursor.execute("SELECT COUNT(*) as total FROM cita WHERE id_veterinario = %s AND DATE(inicio) = CURDATE()", (id_vet,))
+                citas_hoy = cursor.fetchone()['total']
+                
+                cursor.execute("SELECT COUNT(DISTINCT id_mascota) as total FROM cita WHERE id_veterinario = %s", (id_vet,))
+                total_pacientes = cursor.fetchone()['total']
+        
         cursor.close()
         
-        if perfil_data is None:
-            perfil_data = {}
+        # 3. Manejo estricto del estado del modal si no hay perfil
+        if not perfil_data:
+            perfil_data = {
+                'nombre_completo': '',
+                'telefono': '',
+                'tipo_documento': 'CC',
+                'numero_documento': '',
+                'direccion_residencial': ''
+            }
             forzar_modal = True
         else:
             forzar_modal = False
-        
+            
         return render_template('vet/vetHome.html', 
                                perfil=perfil_data, 
                                mostrar_modal=forzar_modal, 
