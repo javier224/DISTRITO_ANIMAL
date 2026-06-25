@@ -1,14 +1,14 @@
 import os
 import pymysql
 pymysql.install_as_MySQLdb()
-
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import MySQLdb.cursors
 import random
 import string
-
-from src.extensiones import mysql, bcrypt, mail
+from src.extensiones import mysql, bcrypt
 from src.models import db
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 app = Flask(__name__)
 app.secret_key = 'distrito_animal_secret_2026'
@@ -19,7 +19,6 @@ DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_NAME = os.environ.get('DB_NAME')
 
 if DB_HOST and DB_USER and DB_PASSWORD and DB_NAME:
-
     app.config['MYSQL_HOST'] = DB_HOST
     app.config['MYSQL_USER'] = DB_USER
     app.config['MYSQL_PASSWORD'] = DB_PASSWORD
@@ -38,21 +37,13 @@ else:
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'distritoanimal2011@gmail.com'
-app.config['MAIL_PASSWORD'] = 'obry zjtz naln imaf'
-app.config['MAIL_DEFAULT_SENDER'] = ('Distrito Animal', 'distritoanimal2011@gmail.com')
-
+# Inicializamos solo los componentes activos
 mysql.init_app(app)
 bcrypt.init_app(app)
-mail.init_app(app)
 db.init_app(app)
 
-# CREACIÓN TABLAS 
+
 with app.app_context():
-    db.drop_all()
     db.create_all()
     
     from src.models import Rol
@@ -99,18 +90,24 @@ def generar_codigo():
 
 def enviar_correo(user_email, asunto, contenido_html):
     try:
-        from flask_mail import Message
-        msg = Message(asunto, recipients=[user_email])
-        msg.html = contenido_html
-        mail.send(msg)
+        message = Mail(
+            from_email='distritoanimal2011@gmail.com',  
+            to_emails=user_email,
+            subject=asunto,
+            html_content=contenido_html
+        )
+        sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+        response = sg.send(message)
+        print(f"📧 Correo enviado exitosamente vía SendGrid! Status: {response.status_code}")
+        return True
     except Exception as e:
-        print(f"Error al enviar correo: {e}")
+        print(f"🚨 Error crítico al enviar correo con SendGrid: {e}")
+        return False
 
 def verificar_perfil_completo(id_usuario):
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute("SELECT * FROM perfil WHERE fk_usuario = %s", (id_usuario,))
     return cursor.fetchone() is not None
-
 #  RUTAS DE NAVEGACIÓN
 
 @app.route('/')
@@ -261,8 +258,7 @@ def register():
                     <p style="color: #888; font-size: 12px; margin-top: 20px;">Si no creaste esta cuenta, ignora este mensaje.</p>
                 </div>
                 """
-                
-                # 🔒 PROTECCIÓN: Envolvemos el envío en un try/except independiente
+        
                 try:
                     enviar_correo(email, "Código de activación 🐾", contenido_html)
                 except Exception as error_mail:
