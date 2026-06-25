@@ -408,7 +408,7 @@ def vet_dashboard():
         
         return render_template('vet/vetHome.html', 
                                perfil=perfil_data, 
-                               mostrar_modal=not perfil_data,
+                               mostrar_modal= perfil_data,
                                citas_hoy=citas_hoy,
                                total_pacientes=total_pacientes)
     
