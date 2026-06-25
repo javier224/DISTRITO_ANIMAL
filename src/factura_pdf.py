@@ -8,10 +8,8 @@ factura_pdf_pb = Blueprint('facturaPdf', __name__, url_prefix='/facturaPdf')
 
 @factura_pdf_pb.route('/descargarPdf/<int:id>')
 def descargarPdf(id):
-    # Usamos el cursor de la conexión centralizada con DictCursor
     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    # 1. Obtener datos de la cabecera de la factura (ajustado a minúsculas según tu SQL)
     sql_factura = """SELECT 
                         f.id,
                         f.numero_consecutivo,
@@ -35,9 +33,9 @@ def descargarPdf(id):
     datos_factura = cursor.fetchone()
 
     if not datos_factura:
+        cursor.close()
         return "Factura no encontrada", 404
 
-    # 2. Obtener detalles (ajustado a los nombres de tu tabla detalle_factura)
     query_detalles = """
         SELECT d.cantidad, d.precio_unitario, d.subtotal, d.porcentaje_iva, d.total_iva, d.subtotal_Sin_Iva, c.nombre
         FROM detalle_factura d
@@ -48,38 +46,34 @@ def descargarPdf(id):
     detalles = cursor.fetchall()
     cursor.close()
 
-    # --- Generación del PDF ---
     pdf = FPDF("L")
     pdf.add_page()
 
-    # Logo
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    LOGO_PATH = os.path.join(BASE_DIR, 'static', 'img', 'logo.png')
 
-    logo_width = 30  # ancho del logo
-    page_width = pdf.w - 2*pdf.l_margin  # ancho útil de la página
+    logo_width = 30  
+    page_width = pdf.w - 2*pdf.l_margin 
     x_center_logo = (page_width - logo_width) / 2 + pdf.l_margin
 
-    pdf.image("static/img/logo.png", x=x_center_logo, y=8, w=logo_width)
+    pdf.image(LOGO_PATH, x=x_center_logo, y=8, w=logo_width)
 
-    # =========================
-    # TÍTULO CENTRADO
-    # =========================
+ 
     pdf.set_font("Helvetica", "B", 16)
-    pdf.set_text_color(0, 100, 0)  # Verde oscuro
+    pdf.set_text_color(0, 100, 0)  
 
-    pdf.ln(35)  # bajar un poco después del logo
+    pdf.ln(35) 
     pdf.cell(0, 10, "DISTRITO ANIMAL - COMPROBANTE", ln=True, align="C")
 
     pdf.ln(15)  
 
-        # Datos del cliente y factura en columnas
     pdf.set_font("Helvetica", "", 11)
     pdf.set_text_color(0, 0, 0)
 
-    pdf.set_fill_color(240, 255, 240)  # Verde muy claro
+    pdf.set_fill_color(240, 255, 240)  
 
-    # Ancho total de las dos celdas
     total_width = 95 + 95  # 190 mm
-    page_width = pdf.w - 2*pdf.l_margin  # ancho útil de la página
+    page_width = pdf.w - 2*pdf.l_margin  
     start_x = (page_width - total_width) / 2 + pdf.l_margin
 
     pdf.set_x(start_x)
@@ -93,13 +87,10 @@ def descargarPdf(id):
     pdf.cell(95, 8, f"Tipo documento: {datos_factura['tipo_documento']}", ln=0, border=1, fill=True)
     pdf.cell(95, 8, f"Fecha expedición: {datos_factura['fecha_expedicion']}", ln=1, border=1, fill=True)
 
-    # Tercera fila
-
+  
     pdf.set_x(start_x)
     pdf.cell(95, 8, f"Número documento: {datos_factura['numero_documento']}", ln=0, border=1, fill=True)
     pdf.cell(95, 8, f"Estado de pago: {datos_factura['estado_pago']}", ln=1, border=1, fill=True)
-
-    # Cuarta fila
 
     pdf.set_x(start_x)
 
@@ -108,14 +99,11 @@ def descargarPdf(id):
 
     pdf.ln(10)
 
-    # =========================
-    # TABLA DE PRODUCTOS
-    # =========================
-    pdf.set_fill_color(0, 100, 0)  # verde oscuro
-    pdf.set_text_color(255, 255, 255)  # blanco
+  
+    pdf.set_fill_color(0, 100, 0)  
+    pdf.set_text_color(255, 255, 255)  
     pdf.set_font("Helvetica", "B", 10)
 
-    # Encabezados
     pdf.cell(50, 10, "Producto", border=1, fill=True)
     pdf.cell(30, 10, "Cantidad", border=1, fill=True, align="C")
     pdf.cell(40, 10, "Precio Unit.", border=1, fill=True, align="C")
@@ -125,7 +113,7 @@ def descargarPdf(id):
     pdf.cell(40, 10, "Subtotal", border=1, fill=True, align="C")
     pdf.ln()
 
-    # Contenido
+ 
     pdf.set_font("Helvetica", "", 10)
     pdf.set_text_color(0, 0, 0)
 
@@ -141,9 +129,6 @@ def descargarPdf(id):
 
     pdf.ln(10)
 
-    # =========================
-    # TOTALES EN UNA SOLA FILA
-    # =========================
     pdf.set_font("Helvetica", "B", 12)
     pdf.set_text_color(0, 100, 0)
 
@@ -157,15 +142,10 @@ def descargarPdf(id):
     pdf.cell(40, 10, f"${float(datos_factura['total']):.2f}", border=1, align="C")
 
     pdf.ln(20)
-
-    # =========================
-    # PIE DE PÁGINA
-    # =========================
     pdf.set_font("Helvetica", "I", 8)
     pdf.set_text_color(50, 50, 50)
     pdf.cell(0, 10, "Distrito Animal | Tel: 3001234567 | Correo: contacto@distritoanimal.com", align="C")
 
-    # Salida del PDF
     pdf_output = pdf.output(dest='S')
 
     if isinstance(pdf_output, str):
