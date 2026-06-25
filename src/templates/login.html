@@ -49,7 +49,7 @@
         }
 
         /* =======================================================
-           MEDIA QUERY: SE ACTIVA AUTOMÁTICAMENTE AL REDUCIR LA VENTANA
+           MEDIA QUERY: CONTROL TOTAL RESPONSIVO EN MÓVILES
            ======================================================= */
         @media screen and (max-width: 768px) {
             body {
@@ -76,13 +76,13 @@
                 box-sizing: border-box;
             }
 
-            /* Forzamos al contenedor principal a reestructurarse por completo */
+            /* Contenedor principal adaptable en altura */
             #container.container {
                 position: relative !important;
                 width: 100% !important;
                 max-width: 400px !important;
                 height: auto !important;
-                min-height: 450px !important;
+                min-height: auto !important;
                 padding: 30px 20px !important;
                 display: block !important;
                 box-shadow: 0 4px 25px rgba(0,0,0,0.15) !important;
@@ -92,7 +92,6 @@
                 transform: none !important;
             }
 
-            /* Contenedor de alertas adaptado al flujo superior del cuadro blanco */
             .messages_container {
                 position: relative !important;
                 top: 0 !important;
@@ -101,12 +100,12 @@
                 text-align: center !important;
             }
 
-            /* Removemos por completo el panel oscuro animado en pantallas chicas */
+            /* Desactivamos el panel deslizante de escritorio en móviles */
             #container .toggle_box {
                 display: none !important;
             }
 
-            /* Forzamos a las cajas de login y registro a soltar el posicionamiento absoluto */
+            /* Forzar comportamiento e ignorar desplazamientos del CSS externo */
             #container .form_box {
                 position: relative !important;
                 width: 100% !important;
@@ -114,18 +113,26 @@
                 left: 0 !important;
                 top: 0 !important;
                 padding: 0 !important;
-                opacity: 1 !important;
-                pointer-events: auto !important;
                 transform: none !important;
-                transition: none !important; /* Desactiva la transición del CSS para que no se desplace de lado */
+                transition: none !important;
             }
 
-            /* Control de visualización por ID para evitar conflictos con las clases activas */
+            /* Aseguramos visibilidad y accesibilidad total interna */
+            #container .form_box form {
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
+
+            /* Estado inicial limpio controlado por CSS prioritario en móvil */
             #loginBox {
-                display: block;
+                display: block !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
             }
             #registerBox {
-                display: none;
+                display: none !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
             }
 
             #container .mobile-toggle {
@@ -142,6 +149,7 @@
                 width: 100% !important;
                 margin: 15px 0 !important;
                 box-sizing: border-box;
+                position: relative !important;
             }
 
             #container .btn {
@@ -259,7 +267,7 @@
             const goToRegister = document.getElementById('goToRegister');
             const goToLogin = document.getElementById('goToLogin');
 
-            // Alternancia táctil limpia por manipulación de display
+            // Alternancia táctil por manipulación de propiedades CSS prioritarias
             if(goToRegister && goToLogin) {
                 goToRegister.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -274,7 +282,7 @@
                 });
             }
 
-            // Configuración de Regex Robustas
+            // Configuración de Validaciones Regex
             const REGEX = {
                 email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                 password: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
